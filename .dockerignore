@@ -1,0 +1,26 @@
+# Maven & build outputs
+/target
+
+# Gradle (present in repo but unused here)
+/.gradle
+/build
+
+# VCS and IDE
+.git
+.gitignore
+.idea
+.vscode
+*.iml
+
+# OS files
+.DS_Store
+
+# Wrapper scripts not needed in image
+mvnw.cmd
+gradlew
+gradlew.bat
+
+# Logs and temp
+logs
+*.log
+.tmp
