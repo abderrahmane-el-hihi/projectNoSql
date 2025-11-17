@@ -1,5 +1,7 @@
 package com.ghp.gestionhospitale.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,10 +13,20 @@ public class Doctor {
     private String id;
 
     private String doctorId; // Custom ID like "D2001"
+    
+    @NotBlank(message = "Le nom est obligatoire")
     private String name;
+    
+    @NotBlank(message = "La spécialité est obligatoire")
     private String specialization;
+    
+    @NotBlank(message = "L'email est obligatoire")
+    @Email(message = "Format d'email invalide")
     private String email;
+    
+    @NotBlank(message = "Le téléphone est obligatoire")
     private String phone;
+    
     private List<String> workingDays; // ["Monday", "Tuesday", "Thursday"]
 
     // Inner class for working hours

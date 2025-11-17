@@ -1,5 +1,7 @@
 package com.ghp.gestionhospitale.model;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -11,11 +13,20 @@ public class Appointment {
     private String id;
 
     private String appointmentId; // Custom ID like "A3001"
+    
+    @NotBlank(message = "L'ID du patient est obligatoire")
     private String patientId;     // Reference to patient
+    
+    @NotBlank(message = "L'ID du médecin est obligatoire")
     private String doctorId;      // Reference to doctor
+    
+    @NotNull(message = "La date est obligatoire")
     private LocalDate date;       // Appointment date
+    
+    @NotBlank(message = "L'heure est obligatoire")
     private String time;          // Appointment time "10:30"
-    private String status;        // "SCHEDULED", "COMPLETED", "CANCELLED"
+    
+    private String status;        // "PLANIFIE", "TERMINE", "ANNULE"
     private String remarks;       // Additional notes
 
     // Default constructor

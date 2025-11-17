@@ -3,6 +3,7 @@ package com.ghp.gestionhospitale.controller;
 import com.ghp.gestionhospitale.model.Appointment;
 import com.ghp.gestionhospitale.model.Doctor;
 import com.ghp.gestionhospitale.services.AppointmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/appointments")
-@CrossOrigin(origins = "http://localhost:3000") // For frontend connection
+@CrossOrigin(origins = {"*"}) // For frontend connection
 public class AppointmentController {
 
     @Autowired
@@ -45,7 +46,7 @@ public class AppointmentController {
 
     // Book new appointment
     @PostMapping
-    public ResponseEntity<?> bookAppointment(@RequestBody Appointment appointment) {
+    public ResponseEntity<?> bookAppointment(@Valid @RequestBody Appointment appointment) {
         try {
             System.out.println("🎯 RECEIVED APPOINTMENT: " + appointment);
             System.out.println("⏰ TIME FIELD: '" + appointment.getTime() + "'");
@@ -65,7 +66,7 @@ public class AppointmentController {
     @PutMapping("/{id}")
     public ResponseEntity<Appointment> updateAppointment(
             @PathVariable String id,
-            @RequestBody Appointment appointment) {
+            @Valid @RequestBody Appointment appointment) {
         Appointment updated = appointmentService.updateAppointment(id, appointment);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
@@ -97,5 +98,17 @@ public class AppointmentController {
             @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         List<Appointment> appointments = appointmentService.findByDate(date);
         return ResponseEntity.ok(appointments);
+    }
+
+    // Manual endpoint to mark past appointments as completed
+    @PostMapping("/maintenance/mark-past-completed")
+    public ResponseEntity<Map<String, Object>> markPastAppointmentsAsCompleted() {
+        LocalDate today = LocalDate.now();
+        int count = appointmentService.markPastAppointmentsAsCompleted(today);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Marked " + count + " past appointment(s) as TERMINE");
+        response.put("count", count);
+        response.put("date", today.toString());
+        return ResponseEntity.ok(response);
     }
 }

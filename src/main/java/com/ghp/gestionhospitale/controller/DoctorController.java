@@ -2,6 +2,7 @@ package com.ghp.gestionhospitale.controller;
 
 import com.ghp.gestionhospitale.model.Doctor;
 import com.ghp.gestionhospitale.services.DoctorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/doctors")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://web-frontend"})
 public class DoctorController {
 
     @Autowired
@@ -38,14 +39,14 @@ public class DoctorController {
 
     // POST - Create new doctor = works
     @PostMapping
-    public ResponseEntity<Doctor> createDoctor(@RequestBody Doctor doctor) {
+    public ResponseEntity<Doctor> createDoctor(@Valid @RequestBody Doctor doctor) {
         Doctor savedDoctor = doctorService.save(doctor);
         return ResponseEntity.ok(savedDoctor);
     }
 
     // PUT - Update doctor
     @PutMapping("/{id}")
-    public ResponseEntity<Doctor> updateDoctor(@PathVariable String id, @RequestBody Doctor doctor) {
+    public ResponseEntity<Doctor> updateDoctor(@PathVariable String id, @Valid @RequestBody Doctor doctor) {
         Doctor updated = doctorService.update(id, doctor);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }

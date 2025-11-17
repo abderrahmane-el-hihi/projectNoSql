@@ -1,5 +1,8 @@
 package com.ghp.gestionhospitale.model;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -16,11 +19,24 @@ public class Patient {
     private String id;
 
     private String patientId; // Custom ID like "P1801"
+    
+    @NotBlank(message = "Le nom est obligatoire")
     private String name;
+    
+    @NotNull(message = "La date de naissance est obligatoire")
     private LocalDate dob; // Date of birth
+    
+    @NotBlank(message = "Le sexe est obligatoire")
     private String gender;
+    
+    @NotBlank(message = "Le téléphone est obligatoire")
     private String phone;
+    
+    @NotBlank(message = "L'email est obligatoire")
+    @Email(message = "Format d'email invalide")
     private String email;
+    
+    @NotBlank(message = "L'adresse est obligatoire")
     private String address;
 
     // Default constructor

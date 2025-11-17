@@ -1,12 +1,14 @@
 package com.ghp.gestionhospitale.services;
 
 import com.ghp.gestionhospitale.model.Appointment;
+import com.ghp.gestionhospitale.model.AppointmentStatus;
 import com.ghp.gestionhospitale.model.Doctor;
 import com.ghp.gestionhospitale.model.Patient;
 import com.ghp.gestionhospitale.repository.PatientRepository;
 import com.ghp.gestionhospitale.repository.AppointmentRepository;
 import com.ghp.gestionhospitale.repository.DoctorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -41,11 +43,15 @@ public class AppointmentService {
         Doctor doctor = doctorOpt.get();
 
         // 1. Check if date is in unavailable dates
-        if (doctor.getUnavailableDates().contains(date.toString())) {
+        if (doctor.getUnavailableDates() != null && doctor.getUnavailableDates().contains(date.toString())) {
             return new ArrayList<>(); // Doctor is unavailable on this date
         }
 
         // 2. Check if date is a working day
+        if (doctor.getWorkingDays() == null || doctor.getWorkingDays().isEmpty()) {
+            return new ArrayList<>(); // No working days defined
+        }
+        
         String dayOfWeek = date.getDayOfWeek().toString();
         String formattedDay = dayOfWeek.charAt(0) + dayOfWeek.substring(1).toLowerCase();
 
@@ -68,22 +74,43 @@ public class AppointmentService {
     private List<String> generateAvailableTimeSlots(Doctor doctor, List<String> bookedSlots) {
         List<String> availableSlots = new ArrayList<>();
 
+        // Check for null working hours and break time
+        if (doctor.getWorkingHours() == null || doctor.getWorkingHours().getStart() == null 
+            || doctor.getWorkingHours().getEnd() == null) {
+            return new ArrayList<>(); // No working hours defined
+        }
+
         LocalTime startTime = LocalTime.parse(doctor.getWorkingHours().getStart());
         LocalTime endTime = LocalTime.parse(doctor.getWorkingHours().getEnd());
-        LocalTime breakStart = LocalTime.parse(doctor.getBreakTime().getStart());
-        LocalTime breakEnd = LocalTime.parse(doctor.getBreakTime().getEnd());
+        
+        LocalTime breakStart = null;
+        LocalTime breakEnd = null;
+        if (doctor.getBreakTime() != null && doctor.getBreakTime().getStart() != null 
+            && doctor.getBreakTime().getEnd() != null) {
+            breakStart = LocalTime.parse(doctor.getBreakTime().getStart());
+            breakEnd = LocalTime.parse(doctor.getBreakTime().getEnd());
+        }
 
+        // Use default duration of 30 minutes if not set or is 0
         int appointmentDuration = doctor.getAppointmentDuration();
+        if (appointmentDuration <= 0) {
+            appointmentDuration = 30; // Default 30 minutes
+        }
 
         LocalTime currentSlot = startTime;
 
-        while (currentSlot.plusMinutes(appointmentDuration).isBefore(endTime) ||
-                currentSlot.plusMinutes(appointmentDuration).equals(endTime)) {
+        // Generate slots: continue while the slot end time is before or equal to endTime
+        while (!currentSlot.isAfter(endTime)) {
+            // Check if slot end time exceeds working hours
+            LocalTime slotEnd = currentSlot.plusMinutes(appointmentDuration);
+            if (slotEnd.isAfter(endTime)) {
+                break; // Slot would exceed working hours
+            }
 
             String slotTime = currentSlot.format(timeFormatter);
 
             // Check if slot is available
-            boolean isAvailable = isSlotAvailable(currentSlot, breakStart, breakEnd, bookedSlots, slotTime);
+            boolean isAvailable = isSlotAvailable(currentSlot, breakStart, breakEnd, bookedSlots, slotTime, appointmentDuration);
 
             if (isAvailable) {
                 availableSlots.add(slotTime);
@@ -97,11 +124,15 @@ public class AppointmentService {
 
     //  CHECK IF A SPECIFIC SLOT IS AVAILABLE
     private boolean isSlotAvailable(LocalTime slot, LocalTime breakStart, LocalTime breakEnd,
-                                    List<String> bookedSlots, String slotTime) {
-        // 1. Check if slot is during break time
-        if ((slot.isAfter(breakStart) && slot.isBefore(breakEnd)) ||
-                (slot.plusMinutes(30).isAfter(breakStart) && slot.plusMinutes(30).isBefore(breakEnd))) {
-            return false;
+                                    List<String> bookedSlots, String slotTime, int appointmentDuration) {
+        LocalTime slotEnd = slot.plusMinutes(appointmentDuration);
+        
+        // 1. Check if slot overlaps with break time (if break time is defined)
+        // Two time ranges overlap if: slotStart < breakEnd AND slotEnd > breakStart
+        if (breakStart != null && breakEnd != null) {
+            if (slot.isBefore(breakEnd) && slotEnd.isAfter(breakStart)) {
+                return false; // Slot overlaps with break time
+            }
         }
 
         // 2. Check if slot is already booked
@@ -134,7 +165,7 @@ public class AppointmentService {
 
         // Generate appointment ID
         appointment.setAppointmentId(generateAppointmentId());
-        appointment.setStatus("SCHEDULED");
+        appointment.setStatus(AppointmentStatus.PLANIFIE);
 
         return appointmentRepository.save(appointment);
     }
@@ -211,11 +242,45 @@ public class AppointmentService {
     public boolean cancelAppointment(String id) {
         Optional<Appointment> appointment = appointmentRepository.findById(id);
         if (appointment.isPresent()) {
-            appointment.get().setStatus("CANCELLED");
+            appointment.get().setStatus(AppointmentStatus.ANNULE);
             appointmentRepository.save(appointment.get());
             return true;
         }
         return false;
+    }
+
+    /**
+     * Mark past appointments as TERMINE (completed).
+     * Updates all appointments with date < today and status = PLANIFIE to TERMINE.
+     * 
+     * @param today The current date (usually LocalDate.now())
+     * @return Number of appointments updated
+     */
+    public int markPastAppointmentsAsCompleted(LocalDate today) {
+        List<Appointment> pastAppointments = appointmentRepository.findAll().stream()
+                .filter(apt -> apt.getDate().isBefore(today))
+                .filter(apt -> AppointmentStatus.PLANIFIE.equals(apt.getStatus()))
+                .toList();
+
+        for (Appointment apt : pastAppointments) {
+            apt.setStatus(AppointmentStatus.TERMINE);
+            appointmentRepository.save(apt);
+        }
+
+        return pastAppointments.size();
+    }
+
+    /**
+     * Scheduled task to automatically mark past appointments as completed.
+     * Runs daily at 2:00 AM.
+     */
+    @Scheduled(cron = "0 0 2 * * ?") // Daily at 2:00 AM
+    public void scheduledMarkPastAppointmentsAsCompleted() {
+        LocalDate today = LocalDate.now();
+        int count = markPastAppointmentsAsCompleted(today);
+        if (count > 0) {
+            System.out.println("✓ Marked " + count + " past appointment(s) as TERMINE");
+        }
     }
 
     public List<Appointment> findByDoctorId(String doctorId) {

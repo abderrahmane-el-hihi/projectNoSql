@@ -55,25 +55,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/error").permitAll()
-
-                        // Patient endpoints
-                        .requestMatchers("/api/patients/register").permitAll()
-                        .requestMatchers("/api/appointments/availability/**").permitAll()
-
-                        // Role-based access
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/patients/**").hasAnyRole("PATIENT", "ADMIN")
-                        .requestMatchers("/api/doctors/**").hasAnyRole("ADMIN", "PATIENT")
-                        .requestMatchers("/api/appointments/**").hasAnyRole("PATIENT", "ADMIN")
-
-                        // Secure all other endpoints
-                        .anyRequest().authenticated()
-                )
-                .authenticationProvider(authenticationProvider())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        // All endpoints are public - no authentication required
+                        .anyRequest().permitAll()
+                );
+                // JWT filter removed - no authentication needed
+                // .authenticationProvider(authenticationProvider())
+                // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -81,7 +68,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://localhost:3000", "http://localhost:8080"));
+        // Allow localhost for development and Docker container
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+            "http://localhost:3000", 
+            "http://localhost:8080",
+            "http://localhost:5173",
+            "http://web-frontend:80",
+            "http://web-frontend"
+        ));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         configuration.setAllowCredentials(true);

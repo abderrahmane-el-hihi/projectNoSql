@@ -25,6 +25,27 @@ services:
       - "8081:8081"
     # environment:
     #   - JAVA_OPTS=-Xms256m -Xmx512m
+  desktop-client:
+    build:
+      context: ./desktop-client
+    container_name: hospital-desktop-client
+    restart: unless-stopped
+    depends_on:
+      - app
+    environment:
+      - API_BASE_URL=http://app:8081/api
+    ports:
+      - "8080:8080"
+
+  web-frontend:
+    build:
+      context: ./web-frontend
+    container_name: hospital-web-frontend
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      - "3000:80"
   
   mongo-express:
     image: mongo-express
@@ -38,6 +59,8 @@ services:
       - ME_CONFIG_MONGODB_SERVER=mongo
       - ME_CONFIG_BASICAUTH_USERNAME=admin
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
+    depends_on:
+      - mongo
 
 volumes:
   mongo-data:

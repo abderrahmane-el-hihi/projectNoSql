@@ -2,6 +2,7 @@ package com.ghp.gestionhospitale.controller;
 
 import com.ghp.gestionhospitale.model.Patient;
 import com.ghp.gestionhospitale.services.PatientService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/patients")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:5173", "http://web-frontend"})
 public class PatientController {
 
     @Autowired
@@ -36,16 +37,29 @@ public class PatientController {
         return patient != null ? ResponseEntity.ok(patient) : ResponseEntity.notFound().build();
     }
 
-    /* POST - Create new patient
+    // POST - Create new patient
     @PostMapping
-    public ResponseEntity<Patient> createPatient(@RequestBody Patient patient) {
-        Patient savedPatient = patientService.save(patient);
-        return ResponseEntity.ok(savedPatient);
-    }*/
+    public ResponseEntity<Patient> createPatient(@Valid @RequestBody Patient patient) {
+        // Use the service method that generates patientId if not provided
+        if (patient.getPatientId() == null || patient.getPatientId().isEmpty()) {
+            Patient savedPatient = patientService.createPatient(
+                    patient.getName(),
+                    patient.getDob(),
+                    patient.getGender(),
+                    patient.getPhone(),
+                    patient.getEmail(),
+                    patient.getAddress()
+            );
+            return ResponseEntity.ok(savedPatient);
+        } else {
+            Patient savedPatient = patientService.save(patient);
+            return ResponseEntity.ok(savedPatient);
+        }
+    }
 
     // PUT - Update patient
     @PutMapping("/{id}")
-    public ResponseEntity<Patient> updatePatient(@PathVariable String id, @RequestBody Patient patient) {
+    public ResponseEntity<Patient> updatePatient(@PathVariable String id, @Valid @RequestBody Patient patient) {
         Patient updated = patientService.update(id, patient);
         return updated != null ? ResponseEntity.ok(updated) : ResponseEntity.notFound().build();
     }
