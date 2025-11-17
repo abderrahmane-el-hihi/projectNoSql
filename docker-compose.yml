@@ -44,6 +44,7 @@ services:
     restart: unless-stopped
     depends_on:
       - app
+      - mongo
     ports:
       - "3000:80"
   
