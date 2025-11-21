@@ -1,12 +1,25 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, Settings, Menu } from 'lucide-react';
+import { User, Settings, Menu, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useToast } from '../components/ui/Toast';
 
 const Navbar = ({ onMenuClick }) => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+  const { showToast } = useToast();
+
+  const handleLogout = () => {
+    setUserMenuOpen(false);
+    logout();
+    navigate('/login');
+    showToast('Vous avez été déconnecté', 'info');
+  };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200 z-30 sticky top-0">
+    <nav className="bg-white/80 backdrop-blur-xl border-b border-white/60 shadow-[0_5px_25px_rgba(15,23,42,0.08)] z-30 sticky top-0">
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Left: Logo and Menu */}
@@ -18,7 +31,7 @@ const Navbar = ({ onMenuClick }) => {
               <Menu className="w-6 h-6" />
             </button>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-indigo-500 rounded-2xl flex items-center justify-center text-white font-bold text-lg">
                 GRH
               </div>
               <div className="hidden sm:block">
@@ -39,7 +52,7 @@ const Navbar = ({ onMenuClick }) => {
                 <User className="w-5 h-5 text-pink-600" />
               </div>
               <span className="hidden sm:block text-sm font-medium text-gray-700">
-                Utilisateur
+                {user?.username || 'Utilisateur'}
               </span>
             </button>
 
@@ -56,9 +69,20 @@ const Navbar = ({ onMenuClick }) => {
                     exit={{ opacity: 0, y: -10, scale: 0.95 }}
                     className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50"
                   >
+                    <div className="px-4 py-2 text-xs text-gray-500">
+                      Connecté en tant que{' '}
+                      <span className="font-semibold text-gray-700">{user?.role}</span>
+                    </div>
                     <button className="w-full flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors">
                       <Settings className="w-4 h-4" />
                       Paramètres
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Déconnexion
                     </button>
                   </motion.div>
                 </>
@@ -72,4 +96,3 @@ const Navbar = ({ onMenuClick }) => {
 };
 
 export default Navbar;
-

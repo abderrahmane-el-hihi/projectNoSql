@@ -46,10 +46,9 @@ public class PatientService {
         return patientRepository.findByEmail(email).isPresent();
     }
 
-    // ADD THIS METHOD - Find by MongoDB ID
-    public Patient findById(String id) {
-        return patientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Patient not found with id: " + id));
+    // Find by MongoDB ID
+    public Optional<Patient> findById(String id) {
+        return patientRepository.findById(id);
     }
 
 
@@ -57,10 +56,8 @@ public class PatientService {
         return patientRepository.findAll();
     }
 
-    // RENAME THIS METHOD to match controller
-    public Patient findByPatientId(String patientId) {
-        return patientRepository.findByPatientId(patientId)
-                .orElseThrow(() -> new RuntimeException("Patient not found with patientId: " + patientId));
+    public Optional<Patient> findByPatientId(String patientId) {
+        return patientRepository.findByPatientId(patientId);
     }
 
     public Patient save(Patient patient) {
@@ -82,18 +79,15 @@ public class PatientService {
         return null;
     }
 
-    // RENAME THIS METHOD to match controller
     public boolean delete(String id) {
-        try {
-            Patient patient = findById(id); // Use the new findById method
-            patientRepository.delete(patient);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        return patientRepository.findById(id)
+                .map(patient -> {
+                    patientRepository.delete(patient);
+                    return true;
+                })
+                .orElse(false);
     }
 
-    // RENAME THIS METHOD to match controller
     public List<Patient> searchByName(String name) {
         return patientRepository.findByNameContainingIgnoreCase(name);
     }

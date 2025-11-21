@@ -1,5 +1,6 @@
 package com.ghp.gestionhospitale.controller;
 
+import com.ghp.gestionhospitale.dto.AppointmentReport;
 import com.ghp.gestionhospitale.model.Appointment;
 import com.ghp.gestionhospitale.services.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +25,9 @@ public class ReportController {
      * GET /api/reports/appointments-by-date?date=YYYY-MM-DD
      */
     @GetMapping("/appointments-by-date")
-    public ResponseEntity<List<Appointment>> getAppointmentsByDate(
+    public ResponseEntity<List<AppointmentReport>> getAppointmentsByDate(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        List<Appointment> appointments = reportService.getAppointmentsByDate(date);
+        List<AppointmentReport> appointments = reportService.getAppointmentsByDate(date);
         return ResponseEntity.ok(appointments);
     }
 
@@ -66,4 +67,3 @@ public class ReportController {
         return ResponseEntity.ok(result);
     }
 }
-

@@ -22,7 +22,12 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://web-frontend",
+        "http://web-frontend:80"
+})
 public class AuthController {
 
     private final AuthenticationManager authenticationManager;
@@ -61,7 +66,6 @@ public class AuthController {
             Map<String, Object> response = new HashMap<>();
             response.put("token", jwt);
             response.put("username", user.getUsername());
-            response.put("password", user.getPassword());
             response.put("role", user.getRole());
             response.put("patientId", user.getPatientId());
             response.put("message", "Login successful");
@@ -172,8 +176,7 @@ public class AuthController {
 
             // If user is a patient, fetch their complete patient profile
             if ("PATIENT".equals(user.getRole()) && user.getPatientId() != null) {
-                Patient patient = patientService.findByPatientId(user.getPatientId());
-                if (patient != null) {
+                patientService.findByPatientId(user.getPatientId()).ifPresent(patient -> {
                     Map<String, Object> patientProfile = new HashMap<>();
                     patientProfile.put("patientId", patient.getPatientId());
                     patientProfile.put("name", patient.getName());
@@ -184,7 +187,7 @@ public class AuthController {
                     patientProfile.put("address", patient.getAddress());
 
                     userProfile.put("patientProfile", patientProfile);
-                }
+                });
             }
 
             return ResponseEntity.ok(userProfile);

@@ -1,5 +1,6 @@
 package com.ghp.gestionhospitale.services;
 
+import com.ghp.gestionhospitale.dto.AppointmentReport;
 import com.ghp.gestionhospitale.model.Appointment;
 import com.ghp.gestionhospitale.model.Doctor;
 import com.ghp.gestionhospitale.model.Patient;
@@ -28,8 +29,10 @@ public class ReportService {
     /**
      * Get all appointments for a given day
      */
-    public List<Appointment> getAppointmentsByDate(LocalDate date) {
-        return appointmentRepository.findByDate(date);
+    public List<AppointmentReport> getAppointmentsByDate(LocalDate date) {
+        return appointmentRepository.findByDate(date).stream()
+                .map(this::mapToReport)
+                .toList();
     }
 
     /**
@@ -49,12 +52,7 @@ public class ReportService {
             Map<String, Object> item = new HashMap<>();
             item.put("doctorId", entry.getKey());
             
-            Optional<Doctor> doctorOpt = doctorRepository.findByDoctorId(entry.getKey());
-            if (doctorOpt.isPresent()) {
-                item.put("doctorName", doctorOpt.get().getName());
-            } else {
-                item.put("doctorName", "Unknown");
-            }
+            item.put("doctorName", findDoctorName(entry.getKey()));
             
             item.put("count", entry.getValue());
             result.add(item);
@@ -77,11 +75,10 @@ public class ReportService {
         Map<String, Long> specialtyCounts = new HashMap<>();
         
         for (Appointment apt : appointments) {
-            Optional<Doctor> doctorOpt = doctorRepository.findByDoctorId(apt.getDoctorId());
-            if (doctorOpt.isPresent()) {
-                String specialty = doctorOpt.get().getSpecialization();
+            findDoctorByIdentifier(apt.getDoctorId()).ifPresent(doctor -> {
+                String specialty = doctor.getSpecialization();
                 specialtyCounts.put(specialty, specialtyCounts.getOrDefault(specialty, 0L) + 1);
-            }
+            });
         }
 
         List<Map<String, Object>> result = new ArrayList<>();
@@ -115,20 +112,7 @@ public class ReportService {
             if (entry.getValue() >= minCount) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("patientId", entry.getKey());
-                
-                Optional<Patient> patientOpt = patientRepository.findByPatientId(entry.getKey());
-                if (patientOpt.isPresent()) {
-                    item.put("patientName", patientOpt.get().getName());
-                } else {
-                    // Try by MongoDB ID if patientId doesn't match
-                    Optional<Patient> patientByIdOpt = patientRepository.findById(entry.getKey());
-                    if (patientByIdOpt.isPresent()) {
-                        item.put("patientName", patientByIdOpt.get().getName());
-                    } else {
-                        item.put("patientName", "Unknown");
-                    }
-                }
-                
+                item.put("patientName", findPatientName(entry.getKey()));
                 item.put("count", entry.getValue());
                 result.add(item);
             }
@@ -139,5 +123,45 @@ public class ReportService {
         
         return result;
     }
-}
 
+    private AppointmentReport mapToReport(Appointment appointment) {
+        return new AppointmentReport(
+                appointment.getId(),
+                appointment.getAppointmentId(),
+                appointment.getPatientId(),
+                findPatientName(appointment.getPatientId()),
+                appointment.getDoctorId(),
+                findDoctorName(appointment.getDoctorId()),
+                appointment.getDate(),
+                appointment.getTime(),
+                appointment.getStatus()
+        );
+    }
+
+    private String findPatientName(String identifier) {
+        if (identifier == null) {
+            return "Unknown";
+        }
+        return patientRepository.findByPatientId(identifier)
+                .or(() -> patientRepository.findById(identifier))
+                .map(Patient::getName)
+                .orElse("Unknown");
+    }
+
+    private String findDoctorName(String identifier) {
+        return findDoctorByIdentifier(identifier)
+                .map(Doctor::getName)
+                .orElse("Unknown");
+    }
+
+    private Optional<Doctor> findDoctorByIdentifier(String identifier) {
+        if (identifier == null) {
+            return Optional.empty();
+        }
+        Optional<Doctor> doctorOpt = doctorRepository.findByDoctorId(identifier);
+        if (doctorOpt.isPresent()) {
+            return doctorOpt;
+        }
+        return doctorRepository.findById(identifier);
+    }
+}

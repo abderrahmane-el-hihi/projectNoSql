@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Users, Stethoscope, Calendar, CalendarCheck } from 'lucide-react';
+import { Users, Stethoscope, Calendar, CalendarCheck, ArrowUpRight } from 'lucide-react';
+import { format } from 'date-fns';
 import Card from '../components/ui/Card';
+import Skeleton from '../components/ui/Skeleton';
+import Badge from '../components/ui/Badge';
 import { getPatients } from '../api/patients';
 import { getDoctors } from '../api/doctors';
 import { getAppointments, getAppointmentsByDate } from '../api/appointments';
 import { useToast } from '../components/ui/Toast';
-import Skeleton from '../components/ui/Skeleton';
-import Badge from '../components/ui/Badge';
-import { format } from 'date-fns';
 
 const StatCard = ({ icon: Icon, label, value, delay = 0 }) => (
   <motion.div
@@ -18,12 +19,12 @@ const StatCard = ({ icon: Icon, label, value, delay = 0 }) => (
   >
     <Card hover className="h-full">
       <div className="flex items-center gap-4">
-        <div className="p-3 bg-primary-100 rounded-lg">
-          <Icon className="w-6 h-6 text-primary-600" />
+        <div className="p-3 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-50 text-primary-600">
+          <Icon className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-2xl font-bold text-gray-900">{value}</p>
-          <p className="text-sm text-gray-600 mt-1">{label}</p>
+          <p className="text-3xl font-semibold text-gray-900">{value}</p>
+          <p className="text-sm text-gray-500 mt-1">{label}</p>
         </div>
       </div>
     </Card>
@@ -56,16 +57,15 @@ const Dashboard = () => {
 
       const today = format(new Date(), 'yyyy-MM-dd');
       const todayAppts = await getAppointmentsByDate(today);
-      
+
       const now = new Date();
-      const upcoming = allAppointments.filter((apt) => {
-        const aptDate = new Date(apt.date + 'T' + apt.time);
-        return aptDate > now && apt.status === 'PLANIFIE';
-      }).sort((a, b) => {
-        const dateA = new Date(a.date + 'T' + a.time);
-        const dateB = new Date(b.date + 'T' + b.time);
-        return dateA - dateB;
-      }).slice(0, 5);
+      const upcoming = allAppointments
+        .filter((apt) => {
+          const aptDate = new Date(`${apt.date}T${apt.time}`);
+          return aptDate > now && apt.status === 'PLANIFIE';
+        })
+        .sort((a, b) => new Date(`${a.date}T${a.time}`) - new Date(`${b.date}T${b.time}`))
+        .slice(0, 5);
 
       setStats({
         totalPatients: patients.length,
@@ -110,109 +110,135 @@ const Dashboard = () => {
     );
   }
 
+  const occupancyRate = Math.min(
+    100,
+    Math.round((stats.todayAppointments / Math.max(1, stats.totalDoctors * 16)) * 100),
+  );
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">Vue d'ensemble du système</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#5de0e6] via-[#6a7bff] to-[#b84ef4] text-white p-8 shadow-[0_30px_80px_rgba(88,63,188,0.25)]"
+      >
+        <div className="absolute -left-10 -top-10 w-56 h-56 bg-white/15 rounded-full blur-3xl opacity-80" />
+        <div className="absolute -right-20 top-1/3 w-72 h-72 bg-white/20 rounded-full blur-3xl opacity-60" />
+        <div className="relative flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          <div>
+            <p className="uppercase text-xs tracking-[0.55em] text-white/70 mb-3">Vue globale</p>
+            <h1 className="text-3xl font-semibold leading-tight">
+              Gestion quotidienne de l&apos;activité hospitalière
+            </h1>
+            <p className="text-white/80 mt-4 max-w-xl">
+              Suivez les rendez-vous, maîtrisez l&apos;occupation des médecins et anticipez les pics grâce
+              à nos indicateurs intelligents.
+            </p>
+            <div className="flex flex-wrap gap-4 mt-6">
+              <div className="bg-white/15 rounded-2xl px-4 py-3">
+                <p className="text-sm text-white/70">Taux de remplissage</p>
+                <p className="text-2xl font-semibold">{occupancyRate}%</p>
+              </div>
+              <div className="bg-white/15 rounded-2xl px-4 py-3">
+                <p className="text-sm text-white/70">Patients actifs</p>
+                <p className="text-2xl font-semibold">{stats.totalPatients}</p>
+              </div>
+            </div>
+          </div>
+          <Link
+            to="/appointments"
+            className="inline-flex items-center gap-2 text-primary-700 px-6 py-3 rounded-2xl font-semibold shadow-lg hover:-translate-y-0.5 transition"
+          >
+            Gérer les rendez-vous
+            <ArrowUpRight className="w-5 h-5" />
+          </Link>
+        </div>
+      </motion.div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard
-          icon={Users}
-          label="Total Patients"
-          value={stats.totalPatients}
-          delay={0}
-        />
-        <StatCard
-          icon={Stethoscope}
-          label="Total Médecins"
-          value={stats.totalDoctors}
-          delay={0.1}
-        />
-        <StatCard
-          icon={Calendar}
-          label="Rendez-vous Aujourd'hui"
-          value={stats.todayAppointments}
-          delay={0.2}
-        />
-        <StatCard
-          icon={CalendarCheck}
-          label="Rendez-vous à Venir"
-          value={stats.upcomingAppointments}
-          delay={0.3}
-        />
+        <StatCard icon={Users} label="Total Patients" value={stats.totalPatients} delay={0} />
+        <StatCard icon={Stethoscope} label="Total Médecins" value={stats.totalDoctors} delay={0.1} />
+        <StatCard icon={Calendar} label="Rendez-vous Aujourd'hui" value={stats.todayAppointments} delay={0.2} />
+        <StatCard icon={CalendarCheck} label="Rendez-vous à Venir" value={stats.upcomingAppointments} delay={0.3} />
       </div>
 
-      {/* Upcoming Appointments */}
-      <Card>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Prochains Rendez-vous
-        </h2>
-        {upcomingAppointments.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
-            <p>Aucun rendez-vous à venir</p>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <Card className="lg:col-span-2">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-900">Prochains rendez-vous</h2>
+              <p className="text-sm text-gray-500">5 créneaux confirmés</p>
+            </div>
+            <Link
+              to="/appointments"
+              className="text-sm font-semibold text-primary-600 hover:text-primary-700 flex items-center gap-1"
+            >
+              Voir tout
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                    Patient
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                    Médecin
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                    Date
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                    Heure
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">
-                    Statut
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {upcomingAppointments.map((apt, index) => (
-                  <motion.tr
-                    key={apt.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="table-row-hover border-b border-gray-100"
-                  >
-                    <td className="py-3 px-4 text-sm text-gray-900">
-                      {apt.patientName || 'N/A'}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-900">
-                      {apt.doctorName || 'N/A'}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {apt.date ? format(new Date(apt.date), 'dd MMM yyyy') : 'N/A'}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {apt.time || 'N/A'}
-                    </td>
-                    <td className="py-3 px-4">
-                      <Badge variant={getStatusBadge(apt.status)}>
-                        {apt.status}
-                      </Badge>
-                    </td>
-                  </motion.tr>
-                ))}
-              </tbody>
-            </table>
+
+          {upcomingAppointments.length === 0 ? (
+            <div className="text-center py-12 text-gray-500">
+              <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p>Aucun rendez-vous à venir</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {upcomingAppointments.map((apt, index) => (
+                <motion.div
+                  key={apt.id}
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.08 }}
+                  className="flex items-center justify-between gap-4 p-4 rounded-2xl border border-gray-100 hover:border-primary-200/60 transition"
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900">{apt.patientName || 'Patient inconnu'}</p>
+                    <p className="text-xs text-gray-500">Avec {apt.doctorName || 'Médecin non attribué'}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-gray-900">
+                      {apt.date ? format(new Date(apt.date), 'dd MMM') : 'N/A'}
+                    </p>
+                    <p className="text-xs text-gray-500">{apt.time || '--:--'}</p>
+                  </div>
+                  <Badge variant={getStatusBadge(apt.status)}>{apt.status}</Badge>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        <Card>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Focus opérationnel</h3>
+          <div className="space-y-5">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Occupation du jour</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-primary-500 to-indigo-500" style={{ width: `${occupancyRate}%` }} />
+                </div>
+                <span className="text-sm font-semibold text-gray-900">{occupancyRate}%</span>
+              </div>
+            </div>
+            <div className="p-4 rounded-2xl bg-primary-50 border border-primary-100">
+              <p className="text-xs uppercase tracking-widest text-primary-600 mb-2">Patients suivis</p>
+              <p className="text-2xl font-bold text-gray-900">{stats.totalPatients}</p>
+              <p className="text-sm text-gray-600">dont {stats.todayAppointments} rendez-vous aujourd&apos;hui</p>
+            </div>
+            <div className="text-sm text-gray-500">
+              Dernière mise à jour :{' '}
+              <span className="font-semibold text-gray-900">
+                {format(new Date(), 'dd MMM yyyy, HH:mm')}
+              </span>
+            </div>
           </div>
-        )}
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 };
 
 export default Dashboard;
-

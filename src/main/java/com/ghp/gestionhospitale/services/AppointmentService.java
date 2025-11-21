@@ -34,13 +34,14 @@ public class AppointmentService {
 
     // CORE AVAILABILITY CHECKING METHOD
     public List<String> getAvailableSlots(String doctorId, LocalDate date) {
-        Optional<Doctor> doctorOpt = doctorRepository.findByDoctorId(doctorId); // Fixed
+        Optional<Doctor> doctorOpt = findDoctorByAnyId(doctorId);
 
         if (doctorOpt.isEmpty()) {
             return new ArrayList<>(); // Doctor not found
         }
 
         Doctor doctor = doctorOpt.get();
+        String normalizedDoctorId = resolveDoctorKey(doctor);
 
         // 1. Check if date is in unavailable dates
         if (doctor.getUnavailableDates() != null && doctor.getUnavailableDates().contains(date.toString())) {
@@ -60,7 +61,7 @@ public class AppointmentService {
         }
 
         // 3. Get existing appointments for this doctor on this date
-        List<Appointment> existingAppointments = appointmentRepository.findByDoctorIdAndDate(doctorId, date);
+        List<Appointment> existingAppointments = appointmentRepository.findByDoctorIdAndDate(normalizedDoctorId, date);
         List<String> bookedSlots = existingAppointments.stream()
                 .map(Appointment::getTime)
                 .toList();
@@ -150,9 +151,19 @@ public class AppointmentService {
             throw new RuntimeException("Time field cannot be empty");
         }
 
+        Doctor doctor = findDoctorByAnyId(appointment.getDoctorId())
+                .orElseThrow(() -> new RuntimeException("Doctor not found with identifier: " + appointment.getDoctorId()));
+        Patient patient = findPatientByAnyId(appointment.getPatientId())
+                .orElseThrow(() -> new RuntimeException("Patient not found with identifier: " + appointment.getPatientId()));
+
+        String normalizedDoctorId = resolveDoctorKey(doctor);
+        String normalizedPatientId = resolvePatientKey(patient);
+        appointment.setDoctorId(normalizedDoctorId);
+        appointment.setPatientId(normalizedPatientId);
+
         // Validate availability before booking
         List<String> availableSlots = getAvailableSlots(
-                appointment.getDoctorId(),
+                normalizedDoctorId,
                 appointment.getDate()
         );
 
@@ -183,7 +194,7 @@ public class AppointmentService {
                     !existingAppointment.getTime().equals(appointmentDetails.getTime())) {
 
                 List<String> availableSlots = getAvailableSlots(
-                        appointmentDetails.getDoctorId(),
+                        existingAppointment.getDoctorId(),
                         appointmentDetails.getDate()
                 );
 
@@ -214,7 +225,7 @@ public class AppointmentService {
 
     // Get doctor's working hours for a specific date
     public String getDoctorWorkingHours(String doctorId, LocalDate date) {
-        Optional<Doctor> doctorOpt = doctorRepository.findByDoctorId(doctorId);
+        Optional<Doctor> doctorOpt = findDoctorByAnyId(doctorId);
 
         if (doctorOpt.isPresent()) {
             Doctor doctor = doctorOpt.get();
@@ -284,14 +295,50 @@ public class AppointmentService {
     }
 
     public List<Appointment> findByDoctorId(String doctorId) {
-        return appointmentRepository.findByDoctorId(doctorId);
+        String normalizedDoctorId = findDoctorByAnyId(doctorId)
+                .map(this::resolveDoctorKey)
+                .orElse(doctorId);
+        return appointmentRepository.findByDoctorId(normalizedDoctorId);
     }
 
     public List<Appointment> findByPatientId(String patientId) {
-        return appointmentRepository.findByPatientId(patientId);
+        String normalizedPatientId = findPatientByAnyId(patientId)
+                .map(this::resolvePatientKey)
+                .orElse(patientId);
+        return appointmentRepository.findByPatientId(normalizedPatientId);
     }
 
     public List<Appointment> findByDate(LocalDate date) {
         return appointmentRepository.findByDate(date);
+    }
+
+    private Optional<Doctor> findDoctorByAnyId(String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            return Optional.empty();
+        }
+        Optional<Doctor> doctorOpt = doctorRepository.findByDoctorId(identifier);
+        if (doctorOpt.isPresent()) {
+            return doctorOpt;
+        }
+        return doctorRepository.findById(identifier);
+    }
+
+    private Optional<Patient> findPatientByAnyId(String identifier) {
+        if (identifier == null || identifier.isBlank()) {
+            return Optional.empty();
+        }
+        Optional<Patient> patientOpt = patientRepository.findByPatientId(identifier);
+        if (patientOpt.isPresent()) {
+            return patientOpt;
+        }
+        return patientRepository.findById(identifier);
+    }
+
+    private String resolveDoctorKey(Doctor doctor) {
+        return doctor.getDoctorId() != null ? doctor.getDoctorId() : doctor.getId();
+    }
+
+    private String resolvePatientKey(Patient patient) {
+        return patient.getPatientId() != null ? patient.getPatientId() : patient.getId();
     }
 }

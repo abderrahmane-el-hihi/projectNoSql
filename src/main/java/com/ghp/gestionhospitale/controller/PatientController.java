@@ -26,15 +26,17 @@ public class PatientController {
     // GET patient by ID
     @GetMapping("/{id}")
     public ResponseEntity<Patient> getPatientById(@PathVariable String id) {
-        Patient patient = patientService.findById(id);
-        return patient != null ? ResponseEntity.ok(patient) : ResponseEntity.notFound().build();
+        return patientService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // GET patient by patientId (our custom ID like "P1801")
     @GetMapping("/by-patient-id/{patientId}")
     public ResponseEntity<Patient> getPatientByPatientId(@PathVariable String patientId) {
-        Patient patient = patientService.findByPatientId(patientId);
-        return patient != null ? ResponseEntity.ok(patient) : ResponseEntity.notFound().build();
+        return patientService.findByPatientId(patientId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // POST - Create new patient

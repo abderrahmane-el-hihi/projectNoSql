@@ -62,6 +62,8 @@ services:
       - ME_CONFIG_BASICAUTH_PASSWORD=admin
     depends_on:
       - mongo
+    volumes:
+      - mongo-data:/data/db 
 
 volumes:
   mongo-data:

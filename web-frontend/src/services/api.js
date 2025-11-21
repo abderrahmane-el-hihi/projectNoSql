@@ -5,12 +5,32 @@ import axios from 'axios';
 // VITE_API_BASE_URL can be set in .env file for local dev
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
+let authToken = null;
+
+export const setAuthToken = (token) => {
+  authToken = token;
+};
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
+
+api.interceptors.request.use((config) => {
+  if (authToken) {
+    config.headers.Authorization = `Bearer ${authToken}`;
+  }
+  return config;
+});
+
+export const authAPI = {
+  login: (credentials) => api.post('/auth/login', credentials),
+  register: (payload) => api.post('/auth/register', payload),
+  registerAdmin: (payload) => api.post('/auth/register-admin', payload),
+  me: () => api.get('/auth/me'),
+};
 
 // Patients API
 export const patientsAPI = {
@@ -63,4 +83,3 @@ export const reportsAPI = {
 };
 
 export default api;
-

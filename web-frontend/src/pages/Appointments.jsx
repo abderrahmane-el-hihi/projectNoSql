@@ -71,16 +71,26 @@ const Appointments = () => {
     }
   };
 
+  const findPatientByIdentifier = (identifier) => {
+    if (!identifier) return undefined;
+    return patients.find((p) => p.id === identifier || p.patientId === identifier);
+  };
+
+  const findDoctorByIdentifier = (identifier) => {
+    if (!identifier) return undefined;
+    return doctors.find((d) => d.id === identifier || d.doctorId === identifier);
+  };
+
   const loadAvailableSlots = async () => {
     try {
       setLoadingSlots(true);
-      // Find the selected doctor to get their doctorId (not MongoDB id)
-      const selectedDoctor = doctors.find(d => d.id === formData.doctorId);
-      if (!selectedDoctor || !selectedDoctor.doctorId) {
+      const selectedDoctor = findDoctorByIdentifier(formData.doctorId);
+      if (!selectedDoctor) {
         setAvailableSlots([]);
         return;
       }
-      const slots = await getAvailableSlots(selectedDoctor.doctorId, formData.date);
+      const doctorKey = selectedDoctor.doctorId || selectedDoctor.id;
+      const slots = await getAvailableSlots(doctorKey, formData.date);
       setAvailableSlots(slots);
     } catch (error) {
       showToast('Erreur lors du chargement des créneaux disponibles', 'error');
@@ -189,15 +199,9 @@ const Appointments = () => {
     return variants[status] || 'default';
   };
 
-  const getPatientName = (patientId) => {
-    const patient = patients.find(p => p.id === patientId);
-    return patient?.name || 'N/A';
-  };
+  const getPatientName = (patientId) => findPatientByIdentifier(patientId)?.name || 'N/A';
 
-  const getDoctorName = (doctorId) => {
-    const doctor = doctors.find(d => d.id === doctorId);
-    return doctor?.name || 'N/A';
-  };
+  const getDoctorName = (doctorId) => findDoctorByIdentifier(doctorId)?.name || 'N/A';
 
   return (
     <div className="space-y-6">
@@ -230,7 +234,7 @@ const Appointments = () => {
             >
               <option value="">Sélectionner un patient</option>
               {patients.map(patient => (
-                <option key={patient.id} value={patient.id}>{patient.name}</option>
+                <option key={patient.id} value={patient.patientId || patient.id}>{patient.name}</option>
               ))}
             </Select>
 
@@ -246,13 +250,13 @@ const Appointments = () => {
             >
               <option value="">Sélectionner un médecin</option>
               {doctors.map(doctor => (
-                <option key={doctor.id} value={doctor.id}>{doctor.name} - {doctor.specialization}</option>
+                <option key={doctor.id} value={doctor.doctorId || doctor.id}>{doctor.name} - {doctor.specialization}</option>
               ))}
             </Select>
 
             {/* Show doctor working days info */}
             {formData.doctorId && (() => {
-              const selectedDoctor = doctors.find(d => d.id === formData.doctorId);
+              const selectedDoctor = findDoctorByIdentifier(formData.doctorId);
               if (selectedDoctor?.workingDays && selectedDoctor.workingDays.length > 0) {
                 // workingDays are already in French from the API transformation
                 const workingDaysFr = selectedDoctor.workingDays.join(', ');
@@ -271,7 +275,7 @@ const Appointments = () => {
               value={formData.date}
               onChange={(e) => {
                 const selectedDate = e.target.value;
-                const selectedDoctor = doctors.find(d => d.id === formData.doctorId);
+                const selectedDoctor = findDoctorByIdentifier(formData.doctorId);
                 
                 // Validate if date is a working day
                 if (selectedDoctor?.workingDays && selectedDoctor.workingDays.length > 0) {
@@ -376,7 +380,7 @@ const Appointments = () => {
               >
                 <option value="">Tous les médecins</option>
                 {doctors.map(doctor => (
-                  <option key={doctor.id} value={doctor.id}>{doctor.name}</option>
+                  <option key={doctor.id} value={doctor.doctorId || doctor.id}>{doctor.name}</option>
                 ))}
               </Select>
               <Input
