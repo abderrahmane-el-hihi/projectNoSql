@@ -143,6 +143,7 @@ public class ReportService {
             return "Unknown";
         }
         return patientRepository.findByPatientId(identifier)
+                .or(() -> patientRepository.findByIdentifier(identifier))
                 .or(() -> patientRepository.findById(identifier))
                 .map(Patient::getName)
                 .orElse("Unknown");

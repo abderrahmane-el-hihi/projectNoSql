@@ -82,6 +82,8 @@ export const reportsAPI = {
     api.get(`/reports/appointments-per-specialty?from=${from}&to=${to}`),
   getFrequentPatients: (from, minCount = 2) => 
     api.get(`/reports/frequent-patients?from=${from}&minCount=${minCount}`),
+  exportPdf: (params) => api.get('/reports/export/pdf', { params, responseType: 'blob' }),
+  exportDocx: (params) => api.get('/reports/export/docx', { params, responseType: 'blob' }),
 };
 
 export const notificationsAPI = {

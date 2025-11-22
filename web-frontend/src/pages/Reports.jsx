@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Calendar, User, Stethoscope, BarChart3 } from 'lucide-react';
+import { Calendar, User, Stethoscope, BarChart3, FileText, FileDown } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { getAppointmentsByDate, getAppointmentsPerDoctor, getAppointmentsPerSpecialty, getFrequentPatients } from '../api/reports';
+import { reportsAPI } from '../services/api';
 import { useToast } from '../components/ui/Toast';
 import Skeleton from '../components/ui/Skeleton';
 import Badge from '../components/ui/Badge';
@@ -41,6 +42,7 @@ const Reports = () => {
   });
   const [frequentPatients, setFrequentPatients] = useState([]);
   const [loadingFrequent, setLoadingFrequent] = useState(false);
+  const [exporting, setExporting] = useState({ pdf: false, docx: false });
 
   const loadAppointmentsByDate = async () => {
     try {
@@ -90,6 +92,41 @@ const Reports = () => {
     }
   };
 
+  const buildExportParams = () => ({
+    date: dateFilter,
+    doctorFrom: doctorDateRange.from,
+    doctorTo: doctorDateRange.to,
+    specialtyFrom: specialtyDateRange.from,
+    specialtyTo: specialtyDateRange.to,
+    frequentFrom: frequentPatientsFilter.from,
+    frequentMin: frequentPatientsFilter.minCount,
+  });
+
+  const exportReport = async (format) => {
+    setExporting((prev) => ({ ...prev, [format]: true }));
+    try {
+      const params = buildExportParams();
+      const request = format === 'pdf' ? reportsAPI.exportPdf(params) : reportsAPI.exportDocx(params);
+      const response = await request;
+      const blobType = format === 'pdf'
+        ? 'application/pdf'
+        : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: blobType }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `rapport-${Date.now()}.${format === 'pdf' ? 'pdf' : 'docx'}`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      showToast(`Rapport ${format.toUpperCase()} téléchargé`, 'success');
+    } catch (error) {
+      showToast("Erreur lors de l'export du rapport", 'error');
+    } finally {
+      setExporting((prev) => ({ ...prev, [format]: false }));
+    }
+  };
+
   const getStatusBadge = (status) => {
     const variants = {
       PLANIFIE: 'primary',
@@ -101,9 +138,31 @@ const Reports = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Rapports</h1>
-        <p className="text-gray-600">Statistiques et analyses</p>
+      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Rapports</h1>
+          <p className="text-gray-600">Statistiques et analyses</p>
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <Button
+            variant="outline"
+            onClick={() => exportReport('pdf')}
+            disabled={exporting.pdf}
+            className="flex items-center gap-2"
+          >
+            <FileText className="w-4 h-4" />
+            {exporting.pdf ? 'Export...' : 'Exporter PDF'}
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => exportReport('docx')}
+            disabled={exporting.docx}
+            className="flex items-center gap-2"
+          >
+            <FileDown className="w-4 h-4" />
+            {exporting.docx ? 'Export...' : 'Exporter DOCX'}
+          </Button>
+        </div>
       </div>
 
       {/* Section 1: Appointments by Date */}
