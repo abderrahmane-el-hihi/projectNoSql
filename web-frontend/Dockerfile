@@ -2,13 +2,7 @@ FROM node:20-alpine AS build
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy source files
+# Copy entire project including existing node_modules to avoid re-install
 COPY . .
 
 # Build the app (set production mode for Vite)
@@ -27,4 +21,3 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 
 CMD ["nginx", "-g", "daemon off;"]
-

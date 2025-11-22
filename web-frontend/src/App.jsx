@@ -7,6 +7,9 @@ import Appointments from './pages/Appointments';
 import Reports from './pages/Reports';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import DoctorDashboard from './pages/DoctorDashboard';
+import PatientPortal from './pages/PatientPortal';
+import Notifications from './pages/Notifications';
 
 function App() {
   return (
@@ -24,6 +27,9 @@ function App() {
           <Route path="/patients" element={<Patients />} />
           <Route path="/doctors" element={<Doctors />} />
           <Route path="/appointments" element={<Appointments />} />
+          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+          <Route path="/patient-portal" element={<PatientPortal />} />
+          <Route path="/notifications" element={<Notifications />} />
           <Route path="/reports" element={<Reports />} />
         </Route>
       </Routes>

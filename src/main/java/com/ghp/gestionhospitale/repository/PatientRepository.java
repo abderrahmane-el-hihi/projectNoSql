@@ -11,6 +11,9 @@ public interface PatientRepository extends MongoRepository<Patient, String> {
     // Find patient by custom patientId (like "P1801")
     Optional<Patient> findByPatientId(String patientId);
 
+    // Find patient by globally unique identifier
+    Optional<Patient> findByIdentifier(String identifier);
+
     // Search patients by name (case-insensitive)
     List<Patient> findByNameContainingIgnoreCase(String name);
 

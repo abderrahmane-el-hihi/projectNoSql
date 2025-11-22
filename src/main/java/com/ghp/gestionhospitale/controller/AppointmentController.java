@@ -85,10 +85,23 @@ public class AppointmentController {
         return ResponseEntity.ok(appointments);
     }
 
+    // Doctor dashboard: today's appointments + stats
+    @GetMapping("/doctor/{doctorId}/dashboard")
+    public ResponseEntity<?> getDoctorDashboard(@PathVariable String doctorId) {
+        return ResponseEntity.ok(appointmentService.getDoctorDashboard(doctorId));
+    }
+
     // GET appointments by patient
     @GetMapping("/patient/{patientId}")
     public ResponseEntity<List<Appointment>> getAppointmentsByPatient(@PathVariable String patientId) {
         List<Appointment> appointments = appointmentService.findByPatientId(patientId);
+        return ResponseEntity.ok(appointments);
+    }
+
+    // Patient portal: appointment history (most recent first)
+    @GetMapping("/patient/{patientId}/history")
+    public ResponseEntity<List<Appointment>> getPatientHistory(@PathVariable String patientId) {
+        List<Appointment> appointments = appointmentService.findPatientHistory(patientId);
         return ResponseEntity.ok(appointments);
     }
 

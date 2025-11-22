@@ -6,6 +6,9 @@ import {
   Stethoscope,
   Calendar,
   BarChart3,
+  Activity,
+  UserCircle2,
+  Bell,
   X,
 } from 'lucide-react';
 
@@ -17,6 +20,9 @@ const Sidebar = ({ isOpen, onClose }) => {
     { path: '/patients', label: 'Patients', icon: Users },
     { path: '/doctors', label: 'Médecins', icon: Stethoscope },
     { path: '/appointments', label: 'Rendez-vous', icon: Calendar },
+    { path: '/doctor-dashboard', label: 'Vue Médecin', icon: Activity },
+    { path: '/patient-portal', label: 'Portail patient', icon: UserCircle2 },
+    { path: '/notifications', label: 'Notifications', icon: Bell },
     { path: '/reports', label: 'Rapports', icon: BarChart3 },
   ];
 

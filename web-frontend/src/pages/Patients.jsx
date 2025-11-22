@@ -6,7 +6,14 @@ import Card from '../components/ui/Card';
 import Modal from '../components/ui/Modal';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
-import { getPatients, createPatient, updatePatient, deletePatient, searchPatients } from '../api/patients';
+import {
+  getPatients,
+  createPatient,
+  updatePatient,
+  deletePatient,
+  searchPatients,
+  getPatientByPatientId,
+} from '../api/patients';
 import { useToast } from '../components/ui/Toast';
 import Skeleton from '../components/ui/Skeleton';
 import { format } from 'date-fns';
@@ -16,6 +23,7 @@ const Patients = () => {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [patientIdFilter, setPatientIdFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
   const [formData, setFormData] = useState({
@@ -62,12 +70,39 @@ const Patients = () => {
     }
   }, []);
 
+  const handlePatientIdSearch = useCallback(async (value) => {
+    if (!value.trim()) {
+      loadPatients();
+      return;
+    }
+    try {
+      setLoading(true);
+      const patient = await getPatientByPatientId(value.trim());
+      setPatients(patient ? [patient] : []);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        setPatients([]);
+      } else {
+        showToast('Erreur lors de la recherche par identifiant patient', 'error');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(() => {
       handleSearch(searchTerm);
     }, 300);
     return () => clearTimeout(timer);
   }, [searchTerm, handleSearch]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      handlePatientIdSearch(patientIdFilter);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [patientIdFilter, handlePatientIdSearch]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -163,15 +198,27 @@ const Patients = () => {
 
       {/* Search */}
       <Card>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Rechercher par nom..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-          />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Rechercher par nom..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Filtrer par Patient ID (ex: P1001)..."
+              value={patientIdFilter}
+              onChange={(e) => setPatientIdFilter(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+            />
+          </div>
         </div>
       </Card>
 
@@ -193,6 +240,7 @@ const Patients = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Patient ID</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nom</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Téléphone</th>
                   <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
@@ -203,12 +251,13 @@ const Patients = () => {
               <tbody>
                 {patients.map((patient, index) => (
                   <motion.tr
-                    key={patient.id}
+                    key={patient.id || patient.patientId}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     className="table-row-hover border-b border-gray-100"
                   >
+                    <td className="py-3 px-4 text-sm font-mono text-gray-700">{patient.patientId || '—'}</td>
                     <td className="py-3 px-4 text-sm text-gray-900">{patient.name}</td>
                     <td className="py-3 px-4 text-sm text-gray-600">{patient.phone}</td>
                     <td className="py-3 px-4 text-sm text-gray-600">{patient.email || '-'}</td>

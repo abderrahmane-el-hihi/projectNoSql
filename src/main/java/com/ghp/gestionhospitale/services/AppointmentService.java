@@ -15,7 +15,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -30,55 +33,51 @@ public class AppointmentService {
     @Autowired
     private PatientRepository patientRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-    // CORE AVAILABILITY CHECKING METHOD
     public List<String> getAvailableSlots(String doctorId, LocalDate date) {
         Optional<Doctor> doctorOpt = findDoctorByAnyId(doctorId);
 
         if (doctorOpt.isEmpty()) {
-            return new ArrayList<>(); // Doctor not found
+            return new ArrayList<>();
         }
 
         Doctor doctor = doctorOpt.get();
         String normalizedDoctorId = resolveDoctorKey(doctor);
 
-        // 1. Check if date is in unavailable dates
         if (doctor.getUnavailableDates() != null && doctor.getUnavailableDates().contains(date.toString())) {
-            return new ArrayList<>(); // Doctor is unavailable on this date
+            return new ArrayList<>();
         }
 
-        // 2. Check if date is a working day
         if (doctor.getWorkingDays() == null || doctor.getWorkingDays().isEmpty()) {
-            return new ArrayList<>(); // No working days defined
+            return new ArrayList<>();
         }
         
         String dayOfWeek = date.getDayOfWeek().toString();
         String formattedDay = dayOfWeek.charAt(0) + dayOfWeek.substring(1).toLowerCase();
 
         if (!doctor.getWorkingDays().contains(formattedDay)) {
-            return new ArrayList<>(); // Doctor doesn't work on this day
+            return new ArrayList<>();
         }
 
-        // 3. Get existing appointments for this doctor on this date
         List<Appointment> existingAppointments = appointmentRepository.findByDoctorIdAndDate(normalizedDoctorId, date);
         List<String> bookedSlots = existingAppointments.stream()
                 .map(Appointment::getTime)
                 .toList();
 
-        // 4. Generate available time slots
         return generateAvailableTimeSlots(doctor, bookedSlots);
     }
 
 
-    // TIME SLOT GENERATION LOGIC
     private List<String> generateAvailableTimeSlots(Doctor doctor, List<String> bookedSlots) {
         List<String> availableSlots = new ArrayList<>();
 
-        // Check for null working hours and break time
         if (doctor.getWorkingHours() == null || doctor.getWorkingHours().getStart() == null 
             || doctor.getWorkingHours().getEnd() == null) {
-            return new ArrayList<>(); // No working hours defined
+            return new ArrayList<>();
         }
 
         LocalTime startTime = LocalTime.parse(doctor.getWorkingHours().getStart());
@@ -92,25 +91,21 @@ public class AppointmentService {
             breakEnd = LocalTime.parse(doctor.getBreakTime().getEnd());
         }
 
-        // Use default duration of 30 minutes if not set or is 0
         int appointmentDuration = doctor.getAppointmentDuration();
         if (appointmentDuration <= 0) {
-            appointmentDuration = 30; // Default 30 minutes
+            appointmentDuration = 30;
         }
 
         LocalTime currentSlot = startTime;
 
-        // Generate slots: continue while the slot end time is before or equal to endTime
         while (!currentSlot.isAfter(endTime)) {
-            // Check if slot end time exceeds working hours
             LocalTime slotEnd = currentSlot.plusMinutes(appointmentDuration);
             if (slotEnd.isAfter(endTime)) {
-                break; // Slot would exceed working hours
+                break;
             }
 
             String slotTime = currentSlot.format(timeFormatter);
 
-            // Check if slot is available
             boolean isAvailable = isSlotAvailable(currentSlot, breakStart, breakEnd, bookedSlots, slotTime, appointmentDuration);
 
             if (isAvailable) {
@@ -123,20 +118,16 @@ public class AppointmentService {
         return availableSlots;
     }
 
-    //  CHECK IF A SPECIFIC SLOT IS AVAILABLE
     private boolean isSlotAvailable(LocalTime slot, LocalTime breakStart, LocalTime breakEnd,
                                     List<String> bookedSlots, String slotTime, int appointmentDuration) {
         LocalTime slotEnd = slot.plusMinutes(appointmentDuration);
         
-        // 1. Check if slot overlaps with break time (if break time is defined)
-        // Two time ranges overlap if: slotStart < breakEnd AND slotEnd > breakStart
         if (breakStart != null && breakEnd != null) {
             if (slot.isBefore(breakEnd) && slotEnd.isAfter(breakStart)) {
-                return false; // Slot overlaps with break time
+                return false;
             }
         }
 
-        // 2. Check if slot is already booked
         if (bookedSlots.contains(slotTime)) {
             return false;
         }
@@ -144,9 +135,7 @@ public class AppointmentService {
         return true;
     }
 
-    // BOOK APPOINTMENT WITH AVAILABILITY VALIDATION
     public Appointment bookAppointment(Appointment appointment) {
-        // Validate time field
         if (appointment.getTime() == null || appointment.getTime().trim().isEmpty()) {
             throw new RuntimeException("Time field cannot be empty");
         }
@@ -161,7 +150,6 @@ public class AppointmentService {
         appointment.setDoctorId(normalizedDoctorId);
         appointment.setPatientId(normalizedPatientId);
 
-        // Validate availability before booking
         List<String> availableSlots = getAvailableSlots(
                 normalizedDoctorId,
                 appointment.getDate()
@@ -174,22 +162,24 @@ public class AppointmentService {
             throw new RuntimeException("Time slot '" + appointment.getTime() + "' is not available. Available slots: " + availableSlots);
         }
 
-        // Generate appointment ID
         appointment.setAppointmentId(generateAppointmentId());
         appointment.setStatus(AppointmentStatus.PLANIFIE);
 
-        return appointmentRepository.save(appointment);
+        Appointment saved = appointmentRepository.save(appointment);
+
+        notificationService.notifyDoctorNewAppointment(doctor, patient, saved);
+        notificationService.notifyPatientNewAppointment(patient, doctor, saved);
+
+        return saved;
     }
 
 
-    // UPDATE APPOINTMENT WITH VALIDATION
     public Appointment updateAppointment(String id, Appointment appointmentDetails) {
         Optional<Appointment> appointmentOpt = appointmentRepository.findById(id);
 
         if (appointmentOpt.isPresent()) {
             Appointment existingAppointment = appointmentOpt.get();
 
-            // If changing time or date, validate availability
             if (!existingAppointment.getDate().equals(appointmentDetails.getDate()) ||
                     !existingAppointment.getTime().equals(appointmentDetails.getTime())) {
 
@@ -203,7 +193,6 @@ public class AppointmentService {
                 }
             }
 
-            // Update fields
             existingAppointment.setDate(appointmentDetails.getDate());
             existingAppointment.setTime(appointmentDetails.getTime());
             existingAppointment.setRemarks(appointmentDetails.getRemarks());
@@ -215,15 +204,11 @@ public class AppointmentService {
         return null;
     }
 
-    // ADDITIONAL AVAILABILITY METHODS
-
-    // Check if a specific slot is available
     public boolean isSlotAvailable(String doctorId, LocalDate date, String time) {
         List<String> availableSlots = getAvailableSlots(doctorId, date);
         return availableSlots.contains(time);
     }
 
-    // Get doctor's working hours for a specific date
     public String getDoctorWorkingHours(String doctorId, LocalDate date) {
         Optional<Doctor> doctorOpt = findDoctorByAnyId(doctorId);
 
@@ -235,13 +220,11 @@ public class AppointmentService {
         return "Not available";
     }
 
-    // GENERATE UNIQUE APPOINTMENT ID
     private String generateAppointmentId() {
         long count = appointmentRepository.count();
         return "A" + (3000 + count + 1);
     }
 
-    // BASIC CRUD METHODS (for completeness)
     public List<Appointment> findAll() {
         return appointmentRepository.findAll();
     }
@@ -260,13 +243,6 @@ public class AppointmentService {
         return false;
     }
 
-    /**
-     * Mark past appointments as TERMINE (completed).
-     * Updates all appointments with date < today and status = PLANIFIE to TERMINE.
-     * 
-     * @param today The current date (usually LocalDate.now())
-     * @return Number of appointments updated
-     */
     public int markPastAppointmentsAsCompleted(LocalDate today) {
         List<Appointment> pastAppointments = appointmentRepository.findAll().stream()
                 .filter(apt -> apt.getDate().isBefore(today))
@@ -281,11 +257,7 @@ public class AppointmentService {
         return pastAppointments.size();
     }
 
-    /**
-     * Scheduled task to automatically mark past appointments as completed.
-     * Runs daily at 2:00 AM.
-     */
-    @Scheduled(cron = "0 0 2 * * ?") // Daily at 2:00 AM
+    @Scheduled(cron = "0 0 2 * * ?")
     public void scheduledMarkPastAppointmentsAsCompleted() {
         LocalDate today = LocalDate.now();
         int count = markPastAppointmentsAsCompleted(today);
@@ -308,6 +280,57 @@ public class AppointmentService {
         return appointmentRepository.findByPatientId(normalizedPatientId);
     }
 
+    public List<Appointment> findPatientHistory(String patientId) {
+        String normalizedPatientId = findPatientByAnyId(patientId)
+                .map(this::resolvePatientKey)
+                .orElse(patientId);
+        return appointmentRepository.findByPatientId(normalizedPatientId).stream()
+                .sorted(Comparator.comparing(Appointment::getDate)
+                        .thenComparing(Appointment::getTime)
+                        .reversed())
+                .toList();
+    }
+
+    public Map<String, Object> getDoctorDashboard(String doctorId) {
+        Doctor doctor = findDoctorByAnyId(doctorId)
+                .orElseThrow(() -> new RuntimeException("Doctor not found with identifier: " + doctorId));
+        String normalizedDoctorId = resolveDoctorKey(doctor);
+
+        List<Appointment> all = appointmentRepository.findByDoctorId(normalizedDoctorId);
+        LocalDate today = LocalDate.now();
+
+        List<Appointment> todays = all.stream()
+                .filter(a -> today.equals(a.getDate()))
+                .sorted(Comparator.comparing(Appointment::getTime))
+                .toList();
+
+        long upcoming = all.stream()
+                .filter(a -> !a.getDate().isBefore(today))
+                .filter(a -> AppointmentStatus.PLANIFIE.equals(a.getStatus()))
+                .count();
+
+        long completed = all.stream()
+                .filter(a -> AppointmentStatus.TERMINE.equals(a.getStatus()))
+                .count();
+
+        long cancelled = all.stream()
+                .filter(a -> AppointmentStatus.ANNULE.equals(a.getStatus()))
+                .count();
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("todayCount", todays.size());
+        stats.put("upcoming", upcoming);
+        stats.put("completed", completed);
+        stats.put("cancelled", cancelled);
+
+        Map<String, Object> dashboard = new HashMap<>();
+        dashboard.put("doctorId", normalizedDoctorId);
+        dashboard.put("todayAppointments", todays);
+        dashboard.put("stats", stats);
+
+        return dashboard;
+    }
+
     public List<Appointment> findByDate(LocalDate date) {
         return appointmentRepository.findByDate(date);
     }
@@ -328,6 +351,10 @@ public class AppointmentService {
             return Optional.empty();
         }
         Optional<Patient> patientOpt = patientRepository.findByPatientId(identifier);
+        if (patientOpt.isPresent()) {
+            return patientOpt;
+        }
+        patientOpt = patientRepository.findByIdentifier(identifier);
         if (patientOpt.isPresent()) {
             return patientOpt;
         }

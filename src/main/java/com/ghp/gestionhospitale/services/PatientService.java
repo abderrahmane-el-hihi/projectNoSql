@@ -60,6 +60,10 @@ public class PatientService {
         return patientRepository.findByPatientId(patientId);
     }
 
+    public Optional<Patient> findByIdentifier(String identifier) {
+        return patientRepository.findByIdentifier(identifier);
+    }
+
     public Patient save(Patient patient) {
         return patientRepository.save(patient);
     }

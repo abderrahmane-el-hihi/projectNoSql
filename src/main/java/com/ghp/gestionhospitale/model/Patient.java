@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -19,6 +20,9 @@ public class Patient {
     private String id;
 
     private String patientId; // Custom ID like "P1801"
+
+    @Indexed(unique = true)
+    private String identifier; // Globally unique identifier like PID-XXXXXX
     
     @NotBlank(message = "Le nom est obligatoire")
     private String name;
@@ -61,6 +65,7 @@ public class Patient {
         return "Patient{" +
                 "id='P" + id + '\'' +
                 ", patientId='" + patientId + '\'' +
+                ", identifier='" + identifier + '\'' +
                 ", name='" + name + '\'' +
                 ", dob=" + dob +
                 ", gender='" + gender + '\'' +

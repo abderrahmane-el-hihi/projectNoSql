@@ -1,11 +1,16 @@
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/GestionHospitaleApplication.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/config/DataInitializer.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/config/MongoDbConf.java
+/workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/config/SampleDataInitializer.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/controller/AppointmentController.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/controller/AuthController.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/controller/DoctorController.java
+/workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/controller/GlobalExceptionHandler.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/controller/PatientController.java
+/workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/controller/ReportController.java
+/workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/dto/AppointmentReport.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/model/Appointment.java
+/workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/model/AppointmentStatus.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/model/Doctor.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/model/Patient.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/model/User.java
@@ -20,3 +25,4 @@
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/services/CustomUserDetailsService.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/services/DoctorService.java
 /workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/services/PatientService.java
+/workspaces/projectNoSql/src/main/java/com/ghp/gestionhospitale/services/ReportService.java

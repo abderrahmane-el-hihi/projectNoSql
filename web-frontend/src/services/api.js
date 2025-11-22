@@ -64,6 +64,8 @@ export const appointmentsAPI = {
   cancel: (id) => api.delete(`/appointments/${id}`),
   getByDoctor: (doctorId) => api.get(`/appointments/doctor/${doctorId}`),
   getByPatient: (patientId) => api.get(`/appointments/patient/${patientId}`),
+  getDoctorDashboard: (doctorId) => api.get(`/appointments/doctor/${doctorId}/dashboard`),
+  getPatientHistory: (patientId) => api.get(`/appointments/patient/${patientId}/history`),
   getByDate: (date) => api.get(`/appointments/date/${date}`),
   getAvailableSlots: (doctorId, date) => 
     api.get(`/appointments/availability/${doctorId}?date=${date}`),
@@ -80,6 +82,10 @@ export const reportsAPI = {
     api.get(`/reports/appointments-per-specialty?from=${from}&to=${to}`),
   getFrequentPatients: (from, minCount = 2) => 
     api.get(`/reports/frequent-patients?from=${from}&minCount=${minCount}`),
+};
+
+export const notificationsAPI = {
+  getRecent: () => api.get('/notifications'),
 };
 
 export default api;

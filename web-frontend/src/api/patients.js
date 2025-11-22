@@ -19,6 +19,15 @@ export const getPatientById = async (id) => {
   };
 };
 
+export const getPatientByPatientId = async (patientId) => {
+  const response = await patientsAPI.getByPatientId(patientId);
+  const patient = response.data;
+  return {
+    ...patient,
+    dateOfBirth: patient.dob || patient.dateOfBirth,
+  };
+};
+
 export const createPatient = async (patient) => {
   // Transform dateOfBirth to dob for backend
   const patientData = {
@@ -51,4 +60,3 @@ export const searchPatients = async (name) => {
   const response = await patientsAPI.search(name);
   return response.data;
 };
-
