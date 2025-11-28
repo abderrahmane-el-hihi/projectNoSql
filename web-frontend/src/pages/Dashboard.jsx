@@ -19,12 +19,12 @@ const StatCard = ({ icon: Icon, label, value, delay = 0 }) => (
   >
     <Card hover className="h-full">
       <div className="flex items-center gap-4">
-        <div className="p-3 rounded-2xl bg-gradient-to-br from-primary-100 to-primary-50 text-primary-600">
+        <div className="p-3 rounded-2xl bg-gradient-to-br from-primary-500/15 to-accent-500/15 text-primary-600 dark:text-primary-200">
           <Icon className="w-6 h-6" />
         </div>
         <div>
-          <p className="text-3xl font-semibold text-gray-900">{value}</p>
-          <p className="text-sm text-gray-500 mt-1">{label}</p>
+          <p className="text-3xl font-semibold text-[var(--text-primary)]">{value}</p>
+          <p className="text-sm text-[var(--text-muted)] mt-1">{label}</p>
         </div>
       </div>
     </Card>
@@ -121,7 +121,7 @@ const Dashboard = () => {
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#5de0e6] via-[#6a7bff] to-[#b84ef4] text-white p-8 shadow-[0_30px_80px_rgba(88,63,188,0.25)]"
+        className="relative overflow-hidden rounded-[28px] bg-gradient-to-r from-primary-500 via-indigo-500 to-accent-500 dark:from-slate-900 dark:via-slate-800 dark:to-indigo-900 text-white p-8 shadow-[0_30px_90px_rgba(79,70,229,0.28)]"
       >
         <div className="absolute -left-10 -top-10 w-56 h-56 bg-white/15 rounded-full blur-3xl opacity-80" />
         <div className="absolute -right-20 top-1/3 w-72 h-72 bg-white/20 rounded-full blur-3xl opacity-60" />
@@ -136,11 +136,11 @@ const Dashboard = () => {
               à nos indicateurs intelligents.
             </p>
             <div className="flex flex-wrap gap-4 mt-6">
-              <div className="bg-white/15 rounded-2xl px-4 py-3">
+              <div className="bg-white/15 rounded-2xl px-4 py-3 backdrop-blur">
                 <p className="text-sm text-white/70">Taux de remplissage</p>
                 <p className="text-2xl font-semibold">{occupancyRate}%</p>
               </div>
-              <div className="bg-white/15 rounded-2xl px-4 py-3">
+              <div className="bg-white/15 rounded-2xl px-4 py-3 backdrop-blur">
                 <p className="text-sm text-white/70">Patients actifs</p>
                 <p className="text-2xl font-semibold">{stats.totalPatients}</p>
               </div>
@@ -148,7 +148,7 @@ const Dashboard = () => {
           </div>
           <Link
             to="/appointments"
-            className="inline-flex items-center gap-2 text-primary-700 px-6 py-3 rounded-2xl font-semibold shadow-lg hover:-translate-y-0.5 transition"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold bg-white/90 text-primary-700 border border-white/50 shadow-[0_18px_45px_rgba(255,255,255,0.4)] hover:-translate-y-0.5 transition dark:bg-slate-900/70 dark:text-primary-100 dark:border-white/10 dark:shadow-[0_15px_40px_rgba(0,0,0,0.35)]"
           >
             Gérer les rendez-vous
             <ArrowUpRight className="w-5 h-5" />
@@ -167,8 +167,8 @@ const Dashboard = () => {
         <Card className="lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Prochains rendez-vous</h2>
-              <p className="text-sm text-gray-500">5 créneaux confirmés</p>
+              <h2 className="text-xl font-semibold text-[var(--text-primary)]">Prochains rendez-vous</h2>
+              <p className="text-sm text-[var(--text-muted)]">5 créneaux confirmés</p>
             </div>
             <Link
               to="/appointments"
@@ -180,8 +180,8 @@ const Dashboard = () => {
           </div>
 
           {upcomingAppointments.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+            <div className="text-center py-12 text-[var(--text-muted)]">
+              <Calendar className="w-12 h-12 mx-auto mb-3 text-[var(--text-subtle)]" />
               <p>Aucun rendez-vous à venir</p>
             </div>
           ) : (
@@ -192,17 +192,17 @@ const Dashboard = () => {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.08 }}
-                  className="flex items-center justify-between gap-4 p-4 rounded-2xl border border-gray-100 hover:border-primary-200/60 transition"
+                  className="flex items-center justify-between gap-4 p-4 rounded-2xl border border-[var(--border-muted)] hover:border-primary-200/60 transition"
                 >
                   <div>
-                    <p className="text-sm font-semibold text-gray-900">{apt.patientName || 'Patient inconnu'}</p>
-                    <p className="text-xs text-gray-500">Avec {apt.doctorName || 'Médecin non attribué'}</p>
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">{apt.patientName || 'Patient inconnu'}</p>
+                    <p className="text-xs text-[var(--text-muted)]">Avec {apt.doctorName || 'Médecin non attribué'}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-gray-900">
+                    <p className="text-sm font-semibold text-[var(--text-primary)]">
                       {apt.date ? format(new Date(apt.date), 'dd MMM') : 'N/A'}
                     </p>
-                    <p className="text-xs text-gray-500">{apt.time || '--:--'}</p>
+                    <p className="text-xs text-[var(--text-muted)]">{apt.time || '--:--'}</p>
                   </div>
                   <Badge variant={getStatusBadge(apt.status)}>{apt.status}</Badge>
                 </motion.div>
@@ -212,25 +212,25 @@ const Dashboard = () => {
         </Card>
 
         <Card>
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Focus opérationnel</h3>
+          <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Focus opérationnel</h3>
           <div className="space-y-5">
             <div>
-              <p className="text-sm text-gray-500 mb-1">Occupation du jour</p>
+              <p className="text-sm text-[var(--text-muted)] mb-1">Occupation du jour</p>
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-primary-500 to-indigo-500" style={{ width: `${occupancyRate}%` }} />
+                  <div className="h-full bg-purple-600" style={{ width: `${occupancyRate}%` }} />
                 </div>
-                <span className="text-sm font-semibold text-gray-900">{occupancyRate}%</span>
+                <span className="text-sm font-semibold text-[var(--text-primary)]">{occupancyRate}%</span>
               </div>
             </div>
             <div className="p-4 rounded-2xl bg-primary-50 border border-primary-100">
               <p className="text-xs uppercase tracking-widest text-primary-600 mb-2">Patients suivis</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalPatients}</p>
-              <p className="text-sm text-gray-600">dont {stats.todayAppointments} rendez-vous aujourd&apos;hui</p>
+              <p className="text-2xl font-bold text-[var(--text-primary)]">{stats.totalPatients}</p>
+              <p className="text-sm text-[var(--text-muted)]">dont {stats.todayAppointments} rendez-vous aujourd&apos;hui</p>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-[var(--text-muted)]">
               Dernière mise à jour :{' '}
-              <span className="font-semibold text-gray-900">
+              <span className="font-semibold text-[var(--text-primary)]">
                 {format(new Date(), 'dd MMM yyyy, HH:mm')}
               </span>
             </div>

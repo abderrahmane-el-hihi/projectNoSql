@@ -1,31 +1,31 @@
 import { motion } from 'framer-motion';
 
-const Button = ({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
-  onClick, 
+const Button = ({
+  children,
+  variant = 'primary',
+  size = 'md',
+  onClick,
   disabled = false,
   type = 'button',
   className = '',
-  ...props 
+  ...props
 }) => {
-  const baseStyles = 'font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-  
+  const baseStyles = 'font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--ring)] disabled:opacity-60 disabled:cursor-not-allowed shadow-[0_6px_18px_rgba(15,23,42,0.08)]';
+
   const variants = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500 shadow-sm hover:shadow-md',
-    secondary: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500 shadow-sm hover:shadow-md',
-    outline: 'border-2 border-purple-600 text-purple-600 hover:bg-purple-50 focus:ring-purple-500',
-    danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm hover:shadow-md',
-    ghost: 'bg-orange-100 text-orange-700 hover:bg-orange-200 focus:ring-orange-500',
+    primary: 'bg-purple-600 text-white hover:bg-purple-700 shadow-[0_10px_22px_rgba(126,34,206,0.25)] hover:-translate-y-0.5',
+    secondary: 'bg-[var(--surface)] text-[var(--text-primary)] border border-[var(--border-muted)] hover:border-[var(--border-strong)] hover:-translate-y-0.5 shadow-[0_4px_12px_rgba(15,23,42,0.06)]',
+    outline: 'border border-[var(--border-muted)] text-[var(--text-primary)] bg-transparent hover:bg-[var(--primary-soft)]',
+    danger: 'bg-danger-600 text-white hover:bg-danger-500 shadow-[0_14px_30px_rgba(239,68,68,0.25)]',
+    ghost: 'bg-[var(--primary-soft)] text-[var(--primary-strong)] hover:-translate-y-0.5',
   };
-  
+
   const sizes = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',
     lg: 'px-6 py-3 text-lg',
   };
-  
+
   return (
     <motion.button
       type={type}
@@ -42,4 +42,3 @@ const Button = ({
 };
 
 export default Button;
-

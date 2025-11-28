@@ -208,8 +208,8 @@ const Appointments = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Rendez-vous</h1>
-          <p className="text-gray-600">Gestion des rendez-vous</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Rendez-vous</h1>
+          <p className="text-[var(--text-muted)]">Gestion des rendez-vous</p>
         </div>
         <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="flex items-center gap-2">
           <Plus className="w-5 h-5" />
@@ -220,8 +220,8 @@ const Appointments = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Booking Form */}
         <Card>
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-primary-600" />
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-primary-600 dark:text-primary-300" />
             Créer un rendez-vous
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -305,28 +305,28 @@ const Appointments = () => {
             />
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label className="block text-sm font-semibold text-[var(--text-muted)] mb-1.5">
                 Heure <span className="text-red-500">*</span>
                 {formData.doctorId && formData.date && availableSlots.length > 0 && (
-                  <span className="ml-2 text-xs font-normal text-gray-500">
+                  <span className="ml-2 text-xs font-normal text-[var(--text-muted)]">
                     ({availableSlots.length} créneau{availableSlots.length > 1 ? 'x' : ''} disponible{availableSlots.length > 1 ? 's' : ''})
                   </span>
                 )}
               </label>
               {!formData.doctorId ? (
-                <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                <div className="p-4 border border-[var(--border-muted)] rounded-xl bg-[var(--surface-strong)] text-[var(--text-muted)] text-sm">
                   Veuillez d'abord sélectionner un médecin
                 </div>
               ) : !formData.date ? (
-                <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 text-sm">
+                <div className="p-4 border border-[var(--border-muted)] rounded-xl bg-[var(--surface-strong)] text-[var(--text-muted)] text-sm">
                   Veuillez d'abord sélectionner une date
                 </div>
               ) : loadingSlots ? (
-                <div className="p-4 border border-gray-300 rounded-lg">
+                <div className="p-4 border border-[var(--border-muted)] rounded-xl bg-[var(--surface-strong)]">
                   <Skeleton variant="text" />
                 </div>
               ) : availableSlots.length === 0 ? (
-                <div className="p-4 border border-yellow-300 rounded-lg bg-yellow-50 text-yellow-800 text-sm">
+                <div className="p-4 border border-yellow-300 rounded-xl bg-yellow-50 text-yellow-800 text-sm dark:border-yellow-500/40 dark:bg-yellow-500/10 dark:text-yellow-50">
                   Aucun créneau disponible pour cette date. Le médecin ne travaille peut-être pas ce jour ou tous les créneaux sont déjà réservés.
                 </div>
               ) : (
@@ -336,10 +336,10 @@ const Appointments = () => {
                       key={slot}
                       type="button"
                       onClick={() => setFormData({ ...formData, time: slot })}
-                      className={`p-2 rounded-lg text-sm font-medium transition-all ${
+                      className={`p-2 rounded-lg text-sm font-medium transition-all border ${
                         formData.time === slot
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-teal-100 text-teal-700 hover:bg-teal-200'
+                          ? 'bg-purple-600 text-white shadow-[0_12px_28px_rgba(126,34,206,0.28)] border-transparent'
+                          : 'bg-[var(--surface-strong)] text-[var(--text-primary)] border-[var(--border-muted)] hover:border-[var(--border-strong)]'
                       }`}
                     >
                       {slot}
@@ -371,7 +371,7 @@ const Appointments = () => {
         <div className="space-y-4">
           {/* Filters */}
           <Card>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Filtres</h3>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Filtres</h3>
             <div className="space-y-3">
               <Select
                 label="Médecin"
@@ -394,7 +394,7 @@ const Appointments = () => {
 
           {/* Appointments Table */}
           <Card>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Rendez-vous à venir</h3>
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">Rendez-vous à venir</h3>
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
@@ -402,8 +402,8 @@ const Appointments = () => {
                 ))}
               </div>
             ) : filteredAppointments.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <Calendar className="w-10 h-10 mx-auto mb-2 text-gray-400" />
+              <div className="text-center py-8 text-[var(--text-muted)]">
+                <Calendar className="w-10 h-10 mx-auto mb-2 text-[var(--text-subtle)]" />
                 <p>Aucun rendez-vous trouvé</p>
               </div>
             ) : (
@@ -414,19 +414,19 @@ const Appointments = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-primary-300 hover:shadow-md transition-all"
+                    className="p-4 border border-[var(--border-muted)] rounded-xl hover:border-[var(--border-strong)] hover:shadow-[0_10px_28px_rgba(15,23,42,0.12)] dark:hover:shadow-[0_12px_32px_rgba(0,0,0,0.3)] transition-all bg-[var(--surface-strong)]/70"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-2">
-                          <User className="w-4 h-4 text-gray-400" />
-                          <span className="font-medium text-gray-900">{getPatientName(apt.patientId)}</span>
+                          <User className="w-4 h-4 text-[var(--text-subtle)]" />
+                          <span className="font-medium text-[var(--text-primary)]">{getPatientName(apt.patientId)}</span>
                         </div>
                         <div className="flex items-center gap-2 mb-2">
-                          <Stethoscope className="w-4 h-4 text-gray-400" />
-                          <span className="text-sm text-gray-600">{getDoctorName(apt.doctorId)}</span>
+                          <Stethoscope className="w-4 h-4 text-[var(--text-subtle)]" />
+                          <span className="text-sm text-[var(--text-muted)]">{getDoctorName(apt.doctorId)}</span>
                         </div>
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-4 text-sm text-[var(--text-muted)]">
                           <div className="flex items-center gap-1">
                             <Calendar className="w-4 h-4" />
                             {apt.date ? format(new Date(apt.date), 'dd/MM/yyyy') : 'N/A'}
@@ -437,7 +437,7 @@ const Appointments = () => {
                           </div>
                         </div>
                         {apt.motif && (
-                          <p className="mt-2 text-sm text-gray-600 italic">"{apt.motif}"</p>
+                          <p className="mt-2 text-sm text-[var(--text-muted)] italic">"{apt.motif}"</p>
                         )}
                       </div>
                       <div className="flex flex-col items-end gap-2">
@@ -447,14 +447,14 @@ const Appointments = () => {
                         <div className="flex gap-1">
                           <button
                             onClick={() => handleEdit(apt)}
-                            className="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+                            className="p-1.5 text-primary-600 dark:text-primary-300 hover:bg-[var(--primary-soft)] rounded-lg transition-colors"
                           >
                             <Edit className="w-4 h-4" />
                           </button>
                           {apt.status === 'PLANIFIE' && (
                             <button
                               onClick={() => setCancelConfirm(apt)}
-                              className="p-1.5 text-amber-600 hover:bg-amber-50 rounded transition-colors"
+                              className="p-1.5 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/15 rounded-lg transition-colors"
                             >
                               <X className="w-4 h-4" />
                             </button>
@@ -553,7 +553,7 @@ const Appointments = () => {
         title="Annuler le rendez-vous"
         size="sm"
       >
-        <p className="text-gray-700 mb-6">
+        <p className="text-[var(--text-muted)] mb-6">
           Êtes-vous sûr de vouloir annuler ce rendez-vous ?
         </p>
         <div className="flex justify-end gap-3">

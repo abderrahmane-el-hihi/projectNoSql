@@ -194,8 +194,8 @@ const Doctors = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Médecins</h1>
-          <p className="text-gray-600">Gestion des médecins</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Médecins</h1>
+          <p className="text-[var(--text-muted)]">Gestion des médecins</p>
         </div>
         <Button onClick={() => { resetForm(); setIsModalOpen(true); }} className="flex items-center gap-2">
           <Plus className="w-5 h-5" />
@@ -207,13 +207,13 @@ const Doctors = () => {
       <Card>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--text-subtle)]" />
             <input
               type="text"
               placeholder="Rechercher par nom..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-3 border rounded-xl bg-[var(--surface-strong)] text-[var(--text-primary)] border-[var(--border-muted)] placeholder-[var(--text-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--border-strong)] shadow-[0_10px_30px_rgba(15,23,42,0.08)]"
             />
           </div>
           <Select
@@ -237,20 +237,20 @@ const Doctors = () => {
             ))}
           </div>
         ) : filteredDoctors.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <Stethoscope className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+          <div className="text-center py-12 text-[var(--text-muted)]">
+            <Stethoscope className="w-12 h-12 mx-auto mb-3 text-[var(--text-subtle)]" />
             <p>Aucun médecin trouvé</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nom</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Spécialité</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Téléphone</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Jours de travail</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
+                <tr className="border-b border-[var(--border-muted)]">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Nom</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Spécialité</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Téléphone</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Jours de travail</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -260,13 +260,13 @@ const Doctors = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="table-row-hover border-b border-gray-100"
+                    className="table-row-hover border-b border-[var(--border-muted)]"
                   >
-                    <td className="py-3 px-4 text-sm text-gray-900">{doctor.name}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{doctor.name}</td>
                     <td className="py-3 px-4">
                       <Badge variant="primary">{doctor.specialization}</Badge>
                     </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">{doctor.phone}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-muted)]">{doctor.phone}</td>
                     <td className="py-3 px-4">
                       <div className="flex flex-wrap gap-1">
                         {(doctor.workingDays || []).map(day => (
@@ -280,13 +280,13 @@ const Doctors = () => {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleEdit(doctor)}
-                          className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          className="p-2 text-primary-600 dark:text-primary-300 hover:bg-[var(--primary-soft)] rounded-lg transition-colors"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(doctor)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-danger-600 hover:bg-red-50 dark:hover:bg-danger-500/15 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -341,7 +341,7 @@ const Doctors = () => {
 
           {/* Working Days */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-[var(--text-muted)] mb-2">
               Jours de travail <span className="text-red-500">*</span>
             </label>
             <div className="flex flex-wrap gap-2">
@@ -368,7 +368,7 @@ const Doctors = () => {
           {/* Working Hours */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Matin</label>
+              <label className="block text-sm font-medium text-[var(--text-muted)] mb-2">Matin</label>
               <div className="flex gap-2">
                 <Input
                   type="time"
@@ -403,7 +403,7 @@ const Doctors = () => {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Après-midi</label>
+              <label className="block text-sm font-medium text-[var(--text-muted)] mb-2">Après-midi</label>
               <div className="flex gap-2">
                 <Input
                   type="time"
@@ -461,7 +461,7 @@ const Doctors = () => {
         title="Confirmer la suppression"
         size="sm"
       >
-        <p className="text-gray-700 mb-6">
+        <p className="text-[var(--text-muted)] mb-6">
           Êtes-vous sûr de vouloir supprimer le médecin <strong>{deleteConfirm?.name}</strong> ?
         </p>
         <div className="flex justify-end gap-3">

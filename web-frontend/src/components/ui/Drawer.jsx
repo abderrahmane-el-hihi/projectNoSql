@@ -22,7 +22,7 @@ const Drawer = ({ isOpen, onClose, title, children, side = 'right' }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/60 z-40 backdrop-blur-sm"
           />
           
           {/* Drawer */}
@@ -31,15 +31,15 @@ const Drawer = ({ isOpen, onClose, title, children, side = 'right' }) => {
             animate={{ x: 0 }}
             exit={slideVariants[side]}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className={`fixed top-0 ${sideClasses[side]} h-full w-full max-w-md bg-white shadow-xl z-50 flex flex-col`}
+            className={`fixed top-0 ${sideClasses[side]} h-full w-full max-w-md bg-[var(--surface)] text-[var(--text-primary)] shadow-[0_12px_28px_rgba(15,23,42,0.18)] border border-[var(--border-muted)] z-50 flex flex-col`}
           >
             {/* Header */}
             {title && (
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+              <div className="flex items-center justify-between p-6 border-b border-[var(--border-muted)] bg-[var(--surface-strong)]/70">
+                <h2 className="text-xl font-semibold">{title}</h2>
                 <button
                   onClick={onClose}
-                  className="p-1 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                  className="p-2 rounded-lg text-[var(--text-subtle)] hover:bg-[var(--primary-soft)] transition-colors"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -58,4 +58,3 @@ const Drawer = ({ isOpen, onClose, title, children, side = 'right' }) => {
 };
 
 export default Drawer;
-

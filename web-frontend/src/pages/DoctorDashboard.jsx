@@ -85,8 +85,8 @@ const DoctorDashboard = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Tableau de bord médecin</h1>
-          <p className="text-gray-600">Vision centralisée des rendez-vous quotidiens</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Tableau de bord médecin</h1>
+          <p className="text-[var(--text-muted)]">Vision centralisée des rendez-vous quotidiens</p>
         </div>
       </div>
 
@@ -129,10 +129,10 @@ const DoctorDashboard = () => {
               return (
                 <Card key={card.title} className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-500">{card.title}</p>
+                    <p className="text-sm text-[var(--text-muted)]">{card.title}</p>
                     <Icon className={`w-5 h-5 ${card.color}`} />
                   </div>
-                    <p className="text-3xl font-bold text-gray-900">{card.value}</p>
+                    <p className="text-3xl font-bold text-[var(--text-primary)]">{card.value}</p>
                 </Card>
               );
             })}
@@ -141,8 +141,8 @@ const DoctorDashboard = () => {
           <Card>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h2 className="text-xl font-semibold text-gray-900">Rendez-vous de la journée</h2>
-                <p className="text-sm text-gray-500">
+                <h2 className="text-xl font-semibold text-[var(--text-primary)]">Rendez-vous de la journée</h2>
+                <p className="text-sm text-[var(--text-muted)]">
                   {dashboard?.todayAppointments?.length || 0} rendez-vous programmés aujourd&apos;hui
                 </p>
               </div>
@@ -152,18 +152,18 @@ const DoctorDashboard = () => {
                 {dashboard.todayAppointments.map((appointment) => (
                   <div key={appointment.id} className="py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-gray-900 font-medium">{appointment.patientId}</p>
-                      <p className="text-sm text-gray-500">{appointment.remarks || 'Consultation'}</p>
+                      <p className="text-[var(--text-primary)] font-medium">{appointment.patientId}</p>
+                      <p className="text-sm text-[var(--text-muted)]">{appointment.remarks || 'Consultation'}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-lg font-semibold text-primary-600">{appointment.time}</p>
-                      <p className="text-sm text-gray-500">{appointment.status}</p>
+                      <p className="text-sm text-[var(--text-muted)]">{appointment.status}</p>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">Aucun rendez-vous prévu aujourd&apos;hui</div>
+              <div className="text-center py-12 text-[var(--text-muted)]">Aucun rendez-vous prévu aujourd&apos;hui</div>
             )}
           </Card>
         </>

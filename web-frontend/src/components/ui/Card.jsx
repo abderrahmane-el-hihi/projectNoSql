@@ -6,10 +6,13 @@ const Card = ({ children, className = '', hover = false, ...props }) => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      className={`rounded-3xl border border-white/60 bg-white/80 backdrop-blur-xl shadow-[0_20px_45px_rgba(15,23,42,0.08)] p-6 ${hover ? 'card-hover' : ''} ${className}`}
+      className={`relative rounded-3xl border border-[var(--border-muted)] bg-[var(--card-gradient)] text-[var(--text-primary)] shadow-[var(--shadow-soft)] backdrop-blur-xl p-6 overflow-hidden ${hover ? 'card-hover' : ''} ${className}`}
       {...props}
     >
+      <div className="pointer-events-none absolute inset-0 opacity-40 blur-2xl bg-[radial-gradient(circle_at_20%_20%,rgba(79,70,229,0.12),transparent_40%),radial-gradient(circle_at_80%_0%,rgba(244,114,182,0.12),transparent_45%)]" />
+      <div className="relative">
       {children}
+      </div>
     </motion.div>
   );
 };

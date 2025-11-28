@@ -80,8 +80,8 @@ const PatientPortal = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Portail patient</h1>
-          <p className="text-gray-600">Historique complet des rendez-vous</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Portail patient</h1>
+          <p className="text-[var(--text-muted)]">Historique complet des rendez-vous</p>
         </div>
       </div>
 
@@ -104,8 +104,8 @@ const PatientPortal = () => {
           )}
           {isPatientUser && (
             <div>
-              <p className="text-sm text-gray-500">Patient connecté</p>
-              <p className="text-lg font-semibold text-gray-900">{selectedPatientLabel}</p>
+              <p className="text-sm text-[var(--text-muted)]">Patient connecté</p>
+              <p className="text-lg font-semibold text-[var(--text-primary)]">{selectedPatientLabel}</p>
             </div>
           )}
         </div>
@@ -119,7 +119,7 @@ const PatientPortal = () => {
         </div>
       ) : history.length === 0 ? (
         <Card>
-          <div className="text-center py-12 text-gray-500">Aucun rendez-vous trouvé pour ce patient.</div>
+          <div className="text-center py-12 text-[var(--text-muted)]">Aucun rendez-vous trouvé pour ce patient.</div>
         </Card>
       ) : (
         <div className="space-y-4">
@@ -131,14 +131,14 @@ const PatientPortal = () => {
                     <CalendarDays className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-lg font-semibold text-gray-900">
+                    <p className="text-lg font-semibold text-[var(--text-primary)]">
                       {appointment.date} • {appointment.time}
                     </p>
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <p className="text-sm text-[var(--text-muted)] flex items-center gap-1">
                       <Stethoscope className="w-4 h-4" />
                       Médecin: {appointment.doctorId}
                     </p>
-                    <p className="text-sm text-gray-500 flex items-center gap-1">
+                    <p className="text-sm text-[var(--text-muted)] flex items-center gap-1">
                       <UserCircle className="w-4 h-4" />
                       Patient ID: {appointment.patientId}
                     </p>
@@ -147,14 +147,14 @@ const PatientPortal = () => {
                 <div className="text-right space-y-2">
                   <span
                     className={`inline-flex items-center gap-2 text-sm font-medium px-3 py-1 rounded-full ${
-                      statusStyles[appointment.status] || 'text-gray-600 bg-gray-100'
+                      statusStyles[appointment.status] || 'text-[var(--text-muted)] bg-gray-100'
                     }`}
                   >
                     <Clock3 className="w-4 h-4" />
                     {appointment.status}
                   </span>
                   {appointment.remarks && (
-                    <p className="text-sm text-gray-500 max-w-xs">{appointment.remarks}</p>
+                    <p className="text-sm text-[var(--text-muted)] max-w-xs">{appointment.remarks}</p>
                   )}
                 </div>
               </div>

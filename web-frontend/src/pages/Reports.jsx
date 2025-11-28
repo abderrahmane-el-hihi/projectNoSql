@@ -140,8 +140,8 @@ const Reports = () => {
     <div className="space-y-6">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Rapports</h1>
-          <p className="text-gray-600">Statistiques et analyses</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Rapports</h1>
+          <p className="text-[var(--text-muted)]">Statistiques et analyses</p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button
@@ -168,12 +168,12 @@ const Reports = () => {
       {/* Section 1: Appointments by Date */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <Calendar className="w-5 h-5 text-primary-600" />
-          <h2 className="text-xl font-semibold text-gray-900">
+          <Calendar className="w-5 h-5 text-primary-600 dark:text-primary-300" />
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
             Rendez-vous d'un jour donné
           </h2>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-[var(--text-muted)] mb-4">
           Consultez tous les rendez-vous pour une date spécifique
         </p>
         <div className="flex gap-3 mb-4">
@@ -194,16 +194,16 @@ const Reports = () => {
             ))}
           </div>
         ) : appointmentsByDate.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">Aucun rendez-vous pour cette date</p>
+          <p className="text-[var(--text-muted)] text-center py-8">Aucun rendez-vous pour cette date</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Patient</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Médecin</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Heure</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Statut</th>
+                <tr className="border-b border-[var(--border-muted)]">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Patient</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Médecin</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Heure</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Statut</th>
                 </tr>
               </thead>
               <tbody>
@@ -213,11 +213,11 @@ const Reports = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="table-row-hover border-b border-gray-100"
+                    className="table-row-hover border-b border-[var(--border-muted)]"
                   >
-                    <td className="py-3 px-4 text-sm text-gray-900">{apt.patientName || 'N/A'}</td>
-                    <td className="py-3 px-4 text-sm text-gray-900">{apt.doctorName || 'N/A'}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600">{apt.time || 'N/A'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{apt.patientName || 'N/A'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{apt.doctorName || 'N/A'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-muted)]">{apt.time || 'N/A'}</td>
                     <td className="py-3 px-4">
                       <Badge variant={getStatusBadge(apt.status)}>
                         {apt.status}
@@ -234,12 +234,12 @@ const Reports = () => {
       {/* Section 2: Appointments per Doctor */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <Stethoscope className="w-5 h-5 text-primary-600" />
-          <h2 className="text-xl font-semibold text-gray-900">
+          <Stethoscope className="w-5 h-5 text-primary-600 dark:text-primary-300" />
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
             Rendez-vous par médecin
           </h2>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-[var(--text-muted)] mb-4">
           Nombre de rendez-vous par médecin sur une période
         </p>
         <div className="flex gap-3 mb-4">
@@ -268,14 +268,14 @@ const Reports = () => {
             ))}
           </div>
         ) : appointmentsPerDoctor.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">Aucune donnée disponible</p>
+          <p className="text-[var(--text-muted)] text-center py-8">Aucune donnée disponible</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Médecin</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nombre de rendez-vous</th>
+                <tr className="border-b border-[var(--border-muted)]">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Médecin</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Nombre de rendez-vous</th>
                 </tr>
               </thead>
               <tbody>
@@ -285,9 +285,9 @@ const Reports = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="table-row-hover border-b border-gray-100"
+                    className="table-row-hover border-b border-[var(--border-muted)]"
                   >
-                    <td className="py-3 px-4 text-sm text-gray-900">{item.doctorName || 'N/A'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{item.doctorName || 'N/A'}</td>
                     <td className="py-3 px-4">
                       <Badge variant="primary">{item.count || 0}</Badge>
                     </td>
@@ -302,12 +302,12 @@ const Reports = () => {
       {/* Section 3: Appointments per Specialty */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <BarChart3 className="w-5 h-5 text-primary-600" />
-          <h2 className="text-xl font-semibold text-gray-900">
+          <BarChart3 className="w-5 h-5 text-primary-600 dark:text-primary-300" />
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
             Rendez-vous par spécialité
           </h2>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-[var(--text-muted)] mb-4">
           Nombre de rendez-vous par spécialité sur une période
         </p>
         <div className="flex gap-3 mb-4">
@@ -336,14 +336,14 @@ const Reports = () => {
             ))}
           </div>
         ) : appointmentsPerSpecialty.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">Aucune donnée disponible</p>
+          <p className="text-[var(--text-muted)] text-center py-8">Aucune donnée disponible</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Spécialité</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nombre de rendez-vous</th>
+                <tr className="border-b border-[var(--border-muted)]">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Spécialité</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Nombre de rendez-vous</th>
                 </tr>
               </thead>
               <tbody>
@@ -353,9 +353,9 @@ const Reports = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="table-row-hover border-b border-gray-100"
+                    className="table-row-hover border-b border-[var(--border-muted)]"
                   >
-                    <td className="py-3 px-4 text-sm text-gray-900">{item.specialty || 'N/A'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{item.specialty || 'N/A'}</td>
                     <td className="py-3 px-4">
                       <Badge variant="secondary">{item.count || 0}</Badge>
                     </td>
@@ -370,12 +370,12 @@ const Reports = () => {
       {/* Section 4: Frequent Patients */}
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <User className="w-5 h-5 text-primary-600" />
-          <h2 className="text-xl font-semibold text-gray-900">
+          <User className="w-5 h-5 text-primary-600 dark:text-primary-300" />
+          <h2 className="text-xl font-semibold text-[var(--text-primary)]">
             Patients fréquents
           </h2>
         </div>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-[var(--text-muted)] mb-4">
           Patients ayant eu le plus de rendez-vous sur une période
         </p>
         <div className="flex gap-3 mb-4">
@@ -405,14 +405,14 @@ const Reports = () => {
             ))}
           </div>
         ) : frequentPatients.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">Aucun patient fréquent trouvé</p>
+          <p className="text-[var(--text-muted)] text-center py-8">Aucun patient fréquent trouvé</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Patient</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nombre de rendez-vous</th>
+                <tr className="border-b border-[var(--border-muted)]">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Patient</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Nombre de rendez-vous</th>
                 </tr>
               </thead>
               <tbody>
@@ -422,9 +422,9 @@ const Reports = () => {
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="table-row-hover border-b border-gray-100"
+                    className="table-row-hover border-b border-[var(--border-muted)]"
                   >
-                    <td className="py-3 px-4 text-sm text-gray-900">{item.patientName || 'N/A'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{item.patientName || 'N/A'}</td>
                     <td className="py-3 px-4">
                       <Badge variant="success">{item.count || 0}</Badge>
                     </td>

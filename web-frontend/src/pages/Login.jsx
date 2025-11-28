@@ -58,26 +58,26 @@ const Login = () => {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
+    <div className="relative min-h-screen overflow-hidden bg-[var(--bg-body)] text-[var(--text-primary)]">
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/80 via-slate-900 to-indigo-900 opacity-90" />
-        <div className="absolute -top-20 -right-10 w-[520px] h-[520px] bg-primary-400/30 blur-[120px] rounded-full" />
-        <div className="absolute -bottom-10 -left-10 w-[420px] h-[420px] bg-indigo-500/30 blur-[140px] rounded-full" />
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-500/10 via-transparent to-accent-500/10" />
+        <div className="absolute -top-24 -right-16 w-[520px] h-[520px] bg-primary-400/20 dark:bg-primary-500/30 blur-[120px] rounded-full" />
+        <div className="absolute -bottom-16 -left-16 w-[460px] h-[460px] bg-accent-400/15 dark:bg-accent-400/20 blur-[140px] rounded-full" />
       </div>
 
-      <div className="relative flex flex-col lg:flex-row min-h-screen">
+      <div className="relative flex flex-col lg:flex-row min-h-screen z-10">
         <motion.div
           initial={{ opacity: 0, x: -40 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6 }}
-          className="hidden lg:flex w-full lg:w-1/2 flex-col justify-between px-12 py-12"
+          className="hidden lg:flex w-full lg:w-1/2 flex-col justify-between px-12 py-14"
         >
           <div>
-            <p className="uppercase text-sm tracking-[0.4em] text-white/70 mb-6">GRH Platform</p>
+            <p className="uppercase text-sm tracking-[0.4em] text-[var(--text-muted)] mb-6">GRH Platform</p>
             <h1 className="text-4xl xl:text-5xl font-semibold leading-tight">
               La nouvelle façon de coordonner les rendez-vous hospitaliers.
             </h1>
-            <p className="mt-6 text-lg text-white/80 max-w-xl">
+            <p className="mt-6 text-lg text-[var(--text-muted)] max-w-xl">
               Automatisez la planification, libérez vos équipes et offrez une expérience fluide aux patients.
             </p>
           </div>
@@ -86,34 +86,37 @@ const Login = () => {
             {heroHighlights.map((highlight) => {
               const Icon = highlight.icon;
               return (
-                <div key={highlight.title} className="bg-white/5 rounded-2xl p-5 border border-white/10 backdrop-blur-xl">
-                  <Icon className="w-8 h-8 text-primary-200 mb-4" />
+                <div
+                  key={highlight.title}
+                  className="rounded-2xl p-5 border border-[var(--border-muted)] bg-[var(--surface)]/70 backdrop-blur-xl shadow-[0_18px_45px_rgba(15,23,42,0.12)]"
+                >
+                  <Icon className="w-8 h-8 text-primary-500 dark:text-primary-200 mb-4" />
                   <h3 className="text-lg font-semibold mb-2">{highlight.title}</h3>
-                  <p className="text-sm text-white/70">{highlight.description}</p>
+                  <p className="text-sm text-[var(--text-muted)]">{highlight.description}</p>
                 </div>
               );
             })}
           </div>
         </motion.div>
 
-        <div className="flex-1 flex items-center justify-center px-6 py-12">
+        <div className="flex-1 flex items-center justify-center px-6 py-16">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="w-full max-w-md bg-white/95 text-gray-900 rounded-3xl shadow-[0_25px_65px_rgba(15,23,42,0.35)] p-8 backdrop-blur-xl"
+            className="w-full max-w-md bg-[var(--surface)] text-[var(--text-primary)] rounded-3xl shadow-[0_25px_65px_rgba(15,23,42,0.24)] dark:shadow-[0_30px_90px_rgba(0,0,0,0.6)] p-8 backdrop-blur-xl border border-[var(--border-muted)]"
           >
             <div className="mb-10">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-50 text-primary-700 text-xs font-semibold mb-4">
-                Platforme sécurisée
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--primary-soft)] text-[var(--primary-strong)] text-xs font-semibold mb-4">
+                Plateforme sécurisée
               </div>
-              <h2 className="text-2xl font-bold text-gray-900">Connexion à GRH</h2>
-              <p className="text-gray-500 mt-1">Identifiez-vous pour accéder à vos outils de pilotage.</p>
+              <h2 className="text-2xl font-bold">Connexion à GRH</h2>
+              <p className="text-[var(--text-muted)] mt-1">Identifiez-vous pour accéder à vos outils de pilotage.</p>
             </div>
 
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="space-y-2">
-                <label htmlFor="username" className="text-sm font-medium text-gray-700">
+                <label htmlFor="username" className="text-sm font-semibold text-[var(--text-muted)]">
                   Nom d&apos;utilisateur
                 </label>
                 <input
@@ -123,14 +126,14 @@ const Login = () => {
                   required
                   value={form.username}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition bg-white"
+                  className="w-full px-4 py-3 rounded-2xl border border-[var(--border-muted)] focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--border-strong)] transition bg-[var(--surface-strong)] text-[var(--text-primary)] placeholder-[var(--text-subtle)] shadow-[0_10px_28px_rgba(15,23,42,0.12)]"
                   placeholder="ex: admin"
                 />
               </div>
 
               <div className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <label htmlFor="password" className="font-medium text-gray-700">
+                  <label htmlFor="password" className="font-semibold text-[var(--text-muted)]">
                     Mot de passe
                   </label>
                 </div>
@@ -141,7 +144,7 @@ const Login = () => {
                   required
                   value={form.password}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-2xl border border-gray-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition bg-white"
+                  className="w-full px-4 py-3 rounded-2xl border border-[var(--border-muted)] focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--border-strong)] transition bg-[var(--surface-strong)] text-[var(--text-primary)] placeholder-[var(--text-subtle)] shadow-[0_10px_28px_rgba(15,23,42,0.12)]"
                   placeholder="••••••••"
                 />
               </div>
@@ -149,13 +152,13 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 rounded-2xl bg-gradient-to-r from-primary-600 to-indigo-600 text-white font-semibold shadow-lg shadow-primary-600/30 hover:shadow-xl transition disabled:opacity-70"
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-primary-500 via-indigo-500 to-accent-500 text-white font-semibold shadow-[0_18px_45px_rgba(79,70,229,0.35)] hover:shadow-[0_22px_60px_rgba(79,70,229,0.45)] transition disabled:opacity-70"
               >
                 {submitting ? 'Connexion...' : 'Se connecter'}
               </button>
             </form>
 
-            <p className="text-xs text-gray-500 text-center mt-6">
+            <p className="text-xs text-[var(--text-muted)] text-center mt-6">
               Accès réservé au personnel autorisé. Toutes les actions sont journalisées.
             </p>
           </motion.div>

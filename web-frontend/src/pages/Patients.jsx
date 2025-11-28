@@ -187,8 +187,8 @@ const Patients = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Patients</h1>
-          <p className="text-gray-600">Gestion des patients</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Patients</h1>
+          <p className="text-[var(--text-muted)]">Gestion des patients</p>
         </div>
         <Button onClick={openCreateModal} className="flex items-center gap-2">
           <Plus className="w-5 h-5" />
@@ -200,23 +200,23 @@ const Patients = () => {
       <Card>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--text-subtle)]" />
             <input
               type="text"
               placeholder="Rechercher par nom..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-3 border rounded-xl bg-[var(--surface-strong)] text-[var(--text-primary)] border-[var(--border-muted)] placeholder-[var(--text-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--border-strong)] shadow-[0_10px_30px_rgba(15,23,42,0.08)]"
             />
           </div>
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-[var(--text-subtle)]" />
             <input
               type="text"
               placeholder="Filtrer par Patient ID (ex: P1001)..."
               value={patientIdFilter}
               onChange={(e) => setPatientIdFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="w-full pl-10 pr-4 py-3 border rounded-xl bg-[var(--surface-strong)] text-[var(--text-primary)] border-[var(--border-muted)] placeholder-[var(--text-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--border-strong)] shadow-[0_10px_30px_rgba(15,23,42,0.08)]"
             />
           </div>
         </div>
@@ -231,21 +231,21 @@ const Patients = () => {
             ))}
           </div>
         ) : patients.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
-            <UserPlus className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+          <div className="text-center py-12 text-[var(--text-muted)]">
+            <UserPlus className="w-12 h-12 mx-auto mb-3 text-[var(--text-subtle)]" />
             <p>Aucun patient trouvé</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Patient ID</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Nom</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Téléphone</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Email</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Date de naissance</th>
-                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
+                <tr className="border-b border-[var(--border-muted)]">
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Patient ID</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Nom</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Téléphone</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Email</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Date de naissance</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-[var(--text-muted)]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -255,26 +255,26 @@ const Patients = () => {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
-                    className="table-row-hover border-b border-gray-100"
+                    className="table-row-hover border-b border-[var(--border-muted)]"
                   >
-                    <td className="py-3 px-4 text-sm font-mono text-gray-700">{patient.patientId || '—'}</td>
-                    <td className="py-3 px-4 text-sm text-gray-900">{patient.name}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600">{patient.phone}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600">{patient.email || '-'}</td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
+                    <td className="py-3 px-4 text-sm font-mono text-[var(--text-muted)]">{patient.patientId || '—'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-primary)]">{patient.name}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-muted)]">{patient.phone}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-muted)]">{patient.email || '-'}</td>
+                    <td className="py-3 px-4 text-sm text-[var(--text-muted)]">
                       {patient.dateOfBirth ? format(new Date(patient.dateOfBirth), 'dd/MM/yyyy') : '-'}
                     </td>
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => handleEdit(patient)}
-                          className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                          className="p-2 text-primary-600 dark:text-primary-300 hover:bg-[var(--primary-soft)] rounded-lg transition-colors"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => setDeleteConfirm(patient)}
-                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-2 text-danger-600 hover:bg-red-50 dark:hover:bg-danger-500/15 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -372,7 +372,7 @@ const Patients = () => {
         title="Confirmer la suppression"
         size="sm"
       >
-        <p className="text-gray-700 mb-6">
+        <p className="text-[var(--text-muted)] mb-6">
           Êtes-vous sûr de vouloir supprimer le patient <strong>{deleteConfirm?.name}</strong> ?
         </p>
         <div className="flex justify-end gap-3">

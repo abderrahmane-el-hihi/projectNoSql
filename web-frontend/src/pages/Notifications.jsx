@@ -33,8 +33,8 @@ const Notifications = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Notifications</h1>
-          <p className="text-gray-600">Historique des SMS et emails envoyés</p>
+          <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">Notifications</h1>
+          <p className="text-[var(--text-muted)]">Historique des SMS et emails envoyés</p>
         </div>
       </div>
 
@@ -46,7 +46,7 @@ const Notifications = () => {
             ))}
           </div>
         ) : notifications.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-[var(--text-muted)]">
             <Bell className="w-10 h-10 mx-auto mb-4" />
             Aucune notification enregistrée.
           </div>
@@ -57,21 +57,21 @@ const Notifications = () => {
               return (
                 <div
                   key={item.id}
-                  className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-100 pb-4 last:border-none"
+                  className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[var(--border-muted)] pb-4 last:border-none"
                 >
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-2xl ${channelColors(item.channel)}`}>
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-lg font-semibold text-gray-900">{item.recipientName}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-lg font-semibold text-[var(--text-primary)]">{item.recipientName}</p>
+                      <p className="text-sm text-[var(--text-muted)]">
                         {item.recipientType === 'DOCTOR' ? 'Médecin' : 'Patient'} • {item.channel}
                       </p>
-                      <p className="text-sm text-gray-600 mt-1">{item.message}</p>
+                      <p className="text-sm text-[var(--text-muted)] mt-1">{item.message}</p>
                     </div>
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-[var(--text-muted)]">
                     {item.timestamp ? new Date(item.timestamp).toLocaleString() : ''}
                   </div>
                 </div>
